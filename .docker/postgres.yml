@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  tecnoprest-postgresql-dev:
+    image: postgres
+    volumes:
+      - ../../../.volumes/tecnoprest/postgresql/:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_DB=cadastro
+    ports:
+      - "5432:5432"
