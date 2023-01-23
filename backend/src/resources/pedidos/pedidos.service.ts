@@ -18,11 +18,19 @@ export class PedidosService {
     private pedidoRepository: Repository<Pedido>,
     @InjectRepository(Roteiro)
     private roteiroRepository: Repository<Roteiro>,
-  ) {}
+  ) { }
 
   async create(createPedidoDto: CreatePedidoDto[]) {
     try {
-      const dataEntrega = createPedidoDto[0].entrega;
+      const dataEntregaString = createPedidoDto[0].entrega.toString();
+
+      const dataEntregaSplit = dataEntregaString.split('/');
+
+      const dataFormatada = new Date(
+        +dataEntregaSplit[2],
+        +dataEntregaSplit[1] - 1,
+        +dataEntregaSplit[0],
+      );
 
       for await (const pedido of createPedidoDto) {
         const pedidoValido = validadeFileData(pedido);
@@ -41,19 +49,8 @@ export class PedidosService {
           pedidoValido.longitude = convertLatLongFloat(pedidoValido.longitude);
         }
 
-        /* const dataFormatada = format(
-          new Date(pedidoValido.entrega),
-          'yyyy-MM-dd',
-        );
-
-        pedidoValido.entrega = new Date(dataFormatada); */
+        pedidoValido.entrega = dataFormatada;
       }
-
-      const dataFormatada = new Date(
-        dataEntrega.getFullYear(),
-        dataEntrega.getMonth(),
-        dataEntrega.getDate(),
-      );
 
       const roteiroCadastrado = await this.roteiroRepository.findOne({
         where: { dataEntrega: dataFormatada },
@@ -67,19 +64,29 @@ export class PedidosService {
         );
         roteiro = roteiroCadastrado;
 
+        console.log('Ja existe');
+        console.log(roteiro);
+
         roteiro.status = 'AGUARDANDO_LAT_LONG';
         await this.roteiroRepository.save(roteiro);
       } else {
         const novoRoteiro = new Roteiro();
-        novoRoteiro.dataEntrega = createPedidoDto[0].entrega;
+        novoRoteiro.dataEntrega = dataFormatada;
         novoRoteiro.status = 'AGUARDANDO_LAT_LONG';
+
+        console.log(novoRoteiro);
+
 
         await this.roteiroRepository.save(novoRoteiro);
         roteiro = novoRoteiro;
       }
 
+      console.log('salvou roteiro');
+
       roteiro.pedidos = [];
       for await (const dto of createPedidoDto) {
+        console.log(dto.entrega);
+
         const pedido = new Pedido(dto);
         pedido.roteiro = roteiro;
         roteiro.pedidos.push(pedido);
