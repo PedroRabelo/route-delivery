@@ -294,6 +294,7 @@ export function DeliveryLocations() {
                 <DeliveryVehicles
                   trucks={deliveryVehicles}
                   handleFilterDeliveryPoints={(plate) => openDeliveriesByTruck(plate)}
+                  handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
                 />
               )
             }

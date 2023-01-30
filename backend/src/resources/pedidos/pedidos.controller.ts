@@ -13,6 +13,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { format, parseISO } from 'date-fns';
 import { getLatLongFromAddress } from 'src/common/utils/getLatLongFromAddress';
 import { readFile, utils } from 'xlsx';
+import { ChangeVeiculoPedido } from './dto/change-veiculo-pedido.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
@@ -20,7 +21,7 @@ import { PedidosService } from './pedidos.service';
 
 @Controller('pedidos')
 export class PedidosController {
-  constructor(private readonly pedidosService: PedidosService) {}
+  constructor(private readonly pedidosService: PedidosService) { }
 
   @Post('upload-sheet')
   @UseInterceptors(FileInterceptor('file', { dest: '/tmp/' }))
@@ -128,5 +129,10 @@ export class PedidosController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.pedidosService.remove(+id);
+  }
+
+  @Post('alterar-veiculos')
+  async changeVehiclesDelivery(@Body() dto: ChangeVeiculoPedido) {
+    return this.pedidosService.changeVehicles(dto);
   }
 }

@@ -21,6 +21,7 @@ export type DeliveryPoints = {
 };
 
 export type DeliveryVehicle = {
+  id: number;
   ordem: number;
   placa: string;
   capacidade: number;

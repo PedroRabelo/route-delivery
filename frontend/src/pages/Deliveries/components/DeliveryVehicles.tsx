@@ -1,36 +1,74 @@
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
-import { TableHead } from "../../../components/TableHead/TableHead";
-import { useSortableTable } from "../../../hooks/useSortableTable";
-import { DeliveryVehicle } from "../../../services/types/Delivery"
+import { useLayoutEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
+import { MoonLoader } from "react-spinners";
+import { api } from "../../../lib/axios";
+import { DeliveryVehicle } from "../../../services/types/Delivery";
 import { formatCurrency, formatNumber } from "../../../services/utils/formatNumber";
 
 type Props = {
   trucks: DeliveryVehicle[] | undefined;
   handleFilterDeliveryPoints: (licencePlate: string) => void;
+  handleFetchDeliveryVehicles: () => void;
 }
 
-const columns = [
-  { label: "Ordem", accessor: "order", sortable: true },
-  { label: "Placa", accessor: "plate", sortable: false },
-  { label: "Capacidade", accessor: "capacity", sortable: true },
-  { label: "Locais", accessor: "locations", sortable: true },
-  { label: "Pedidos", accessor: "orders", sortable: true },
-  { label: "Carga(KG)", accessor: "load", sortable: true },
-  { label: "Valor(R$)", accessor: "amount", sortable: true },
-  { label: "(%)", accessor: "percentage", sortable: true },
-];
+export default function DeliveryVehicles({ trucks, handleFilterDeliveryPoints, handleFetchDeliveryVehicles }: Props) {
 
-export default function DeliveryVehicles({ trucks, handleFilterDeliveryPoints }: Props) {
+  const { id } = useParams();
+
+  const checkbox = useRef<HTMLInputElement>({} as HTMLInputElement);
 
   const [plateSelected, setPlateSelected] = useState('');
+  const [checked, setChecked] = useState(false);
+  const [indeterminate, setIndeterminate] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<DeliveryVehicle[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  //const [tableData, handleSorting] = useSortableTable(trucks, columns);
+
+  useLayoutEffect(() => {
+    if (trucks && trucks.length > 0) {
+      const isIndeterminate = selectedVehicle.length > 0 && selectedVehicle.length < trucks.length
+      setChecked(selectedVehicle.length === trucks.length)
+      setIndeterminate(isIndeterminate)
+      if (checkbox !== undefined)
+        checkbox.current.indeterminate = isIndeterminate
+    }
+  }, [selectedVehicle])
 
   function handleLicensePlateClick(licencePlate: string) {
     setPlateSelected(licencePlate);
     handleFilterDeliveryPoints(licencePlate);
+  }
+
+  async function handleTruckChange() {
+    if (selectedVehicle.length > 2) {
+      alert('Informe apenas 2 veículos para fazer a troca');
+      return;
+    }
+
+    if (selectedVehicle[0].capacidade !== selectedVehicle[1].capacidade) {
+      alert('Veículos precisam ter a mesma capacidade de carga.');
+      return;
+    }
+
+    setLoading(true);
+    const payload = {
+      roteiroId: id,
+      veiculo1Id: selectedVehicle[0].id,
+      placa1: selectedVehicle[0].placa,
+      veiculo2Id: selectedVehicle[1].id,
+      placa2: selectedVehicle[1].placa
+    }
+
+    await api.post(`/pedidos/alterar-veiculos`, payload);
+
+    handleFetchDeliveryVehicles();
+
+    setSelectedVehicle([]);
+
+    alert('Troca de veículo realizada com sucesso.');
+    setLoading(false);
   }
 
   function getSumByKey(arr: DeliveryVehicle[], key: string | number) {
@@ -48,14 +86,96 @@ export default function DeliveryVehicles({ trucks, handleFilterDeliveryPoints }:
     <div className="mt-8 flex flex-col">
       <div className="-my-2 -mx-4 sm:-mx-6 lg:-mx-8">
         <div className="inline-block min-w-full align-middle">
-          <div className="overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+          <div className="relative overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
             <table className="min-w-full divide-y divide-gray-300">
-              <TableHead
-                columns={columns}
-              />
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell">
+                    {selectedVehicle.length > 0 && (
+                      <div className="flex items-center space-x-3 bg-gray-50 sm:left-16">
+                        <button
+                          type="button"
+                          disabled={selectedVehicle.length < 2}
+                          className="inline-flex rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-30"
+                          onClick={() => handleTruckChange()}
+                        >
+                          {loading && <MoonLoader color="#164e63" size={18} className="h-3 w-3" />}
+                          {!loading && <ArrowPathRoundedSquareIcon className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
+                  >
+                    Ordem
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    Placa
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    Capacidade(KG)
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    Locais
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    Pedidos
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    Carga(KG)
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    Valor(R$)
+                  </th>
+                  <th
+                    scope="col"
+                    className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                  >
+                    (%)
+                  </th>
+                </tr>
+              </thead>
               <tbody className="divide-y divide-gray-200 bg-white">
                 {trucks && trucks?.length > 0 && trucks.map((truck) => (
-                  <tr key={truck.placa}>
+                  <tr key={truck.placa} className={selectedVehicle.includes(truck) ? 'bg-gray-50' : undefined}>
+                    <td className="relative w-12 px-6 sm:w-16 sm:px-8">
+                      {selectedVehicle.includes(truck) && (
+                        <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
+                      )}
+                      <input
+                        type="checkbox"
+                        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
+                        value={truck.placa}
+                        checked={selectedVehicle.includes(truck)}
+                        onChange={(e) =>
+                          setSelectedVehicle(
+                            e.target.checked
+                              ? [...selectedVehicle, truck]
+                              : selectedVehicle.filter((p) => p !== truck)
+                          )
+                        }
+                      />
+                    </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{truck.ordem}</td>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
                       <a

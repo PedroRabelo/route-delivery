@@ -12,5 +12,17 @@ export class Veiculo {
   capacidade: number;
 
   @Column({ name: 'ativo' })
-  ativo: number;
+  ativo: boolean;
+
+  @Column({ name: 'RODIZIO' })
+  rodizio: string;
+
+  @Column({ name: 'PERC_CHEIO' })
+  percentualCheio: number;
+
+  @Column({ name: 'MAX_LOCAL' })
+  qtdLocais: number;
+
+  @Column({ name: 'COD_FROTA' })
+  codigoFrota: number;
 }

@@ -51,6 +51,12 @@ export class Pedido {
   @Column({ name: 'Bruto', type: 'float' })
   bruto: number;
 
+  @Column({ name: 'ID_VEICULO' })
+  veiculoId: number;
+
+  @Column({ name: 'PLACA' })
+  placa: string;
+
   @ManyToOne(() => Roteiro, (roteiro) => roteiro.pedidos)
   roteiro: Roteiro;
 

@@ -10,7 +10,7 @@ export class VeiculosService {
   constructor(
     @InjectRepository(Veiculo)
     private veiculoRepository: Repository<Veiculo>,
-  ) {}
+  ) { }
 
   async create(createVeiculoDto: CreateVeiculoDto) {
     try {
@@ -23,7 +23,7 @@ export class VeiculosService {
       }
 
       const data = {
-        ativo: 1,
+        ativo: true,
         ...createVeiculoDto,
       };
 

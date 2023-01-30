@@ -5,6 +5,7 @@ import { convertLatLongFloat } from 'src/common/utils/convertLatLongFloat';
 import { slicePedidosIntoChunks } from 'src/common/utils/sliceArrayIntoChunks';
 import { validadeFileData } from 'src/common/utils/validadeFileData';
 import { Repository } from 'typeorm';
+import { ChangeVeiculoPedido } from './dto/change-veiculo-pedido.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
@@ -171,6 +172,7 @@ export class PedidosService {
     return await this.pedidoRepository.query(
       `
       SELECT
+        VEIC.ID as id,
         VEIC.ORD_CAR as ordem,
         VEIC.PLACA as placa,
         VEIC.CAPACIDADE as capacidade,
@@ -185,7 +187,7 @@ export class PedidosService {
         INNER JOIN VEICULOS VEIC ON VEIC.ID = PED.ID_VEICULO
       WHERE 
         PED.roteiroId=@0
-      GROUP BY VEIC.ORD_CAR,VEIC.PLACA,VEIC.CAPACIDADE,VEIC.RODIZIO
+      GROUP BY VEIC.ID, VEIC.ORD_CAR,VEIC.PLACA,VEIC.CAPACIDADE,VEIC.RODIZIO
       ORDER BY percentual
       `,
       [id],
@@ -294,5 +296,40 @@ export class PedidosService {
 
   async remove(id: number): Promise<void> {
     await this.pedidoRepository.delete(id);
+  }
+
+  async changeVehicles(dto: ChangeVeiculoPedido) {
+    const pedidosVeiculo1 = await this.pedidoRepository.find({
+      where: {
+        roteiro: { id: dto.roteiroId },
+        veiculoId: dto.veiculo1Id
+      }
+    });
+
+    const pedidosVeiculo2 = await this.pedidoRepository.find({
+      where: {
+        roteiro: { id: dto.roteiroId },
+        veiculoId: dto.veiculo2Id
+      }
+    });
+
+    const novoVeiculoPedidos1: Pedido[] = pedidosVeiculo1.map((vei1) => {
+      return {
+        ...vei1,
+        veiculoId: dto.veiculo2Id,
+        placa: dto.placa2,
+      }
+    });
+
+    const novoVeiculoPedidos2: Pedido[] = pedidosVeiculo2.map((vei2) => {
+      return {
+        ...vei2,
+        veiculoId: dto.veiculo1Id,
+        placa: dto.placa1,
+      }
+    });
+
+    await this.pedidoRepository.save(novoVeiculoPedidos1);
+    await this.pedidoRepository.save(novoVeiculoPedidos2);
   }
 }

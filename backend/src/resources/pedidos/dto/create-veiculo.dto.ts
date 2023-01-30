@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateVeiculoDto {
   @IsString()
@@ -9,7 +9,21 @@ export class CreateVeiculoDto {
   @IsNotEmpty()
   capacidade: number;
 
+  @IsBoolean()
+  @IsOptional()
+  ativo?: boolean;
+
+  @IsString()
+  @IsNotEmpty()
+  rodizio: string;
+
+  @IsNumber()
+  percentualCheio: number;
+
+  @IsNumber()
+  qtdLocais: number;
+
   @IsNumber()
   @IsOptional()
-  ativo?: number;
+  codigoFrota: number;
 }
