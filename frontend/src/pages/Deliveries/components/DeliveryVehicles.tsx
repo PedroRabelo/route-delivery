@@ -47,8 +47,13 @@ export default function DeliveryVehicles({ trucks, handleFilterDeliveryPoints, h
       return;
     }
 
-    if (selectedVehicle[0].capacidade !== selectedVehicle[1].capacidade) {
-      alert('Veículos precisam ter a mesma capacidade de carga.');
+    if (selectedVehicle[0].peso >= selectedVehicle[1].capacidade) {
+      alert(`A capacidade do veículo ${selectedVehicle[1].placa} não suporta a carga`);
+      return;
+    }
+
+    if (selectedVehicle[1].peso >= selectedVehicle[0].capacidade) {
+      alert(`A capacidade do veículo ${selectedVehicle[0].placa} não suporta a carga`);
       return;
     }
 

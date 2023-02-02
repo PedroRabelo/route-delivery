@@ -43,3 +43,38 @@ export type VehicleDeliveries = {
   vehicle: DeliveryVehicle;
   orders?: DeliveryPoints[];
 };
+
+type DiaSemana = {
+  id: string;
+  name: string;
+  title: string;
+}
+
+const diasSemana: DiaSemana[] = [
+  {
+    id: '2',
+    name: 'SEGUNDA-FEIRA',
+    title: 'SEG'
+  },
+  {
+    id: '3',
+    name: 'TERÇA-FEIRA',
+    title: 'TER'
+  },
+  {
+    id: '4',
+    name: 'QUARTA-FEIRA',
+    title: 'QUA'
+  },
+  {
+    id: '5',
+    name: 'QUINTA-FEIRA',
+    title: 'QUI'
+  },
+  {
+    id: '6',
+    name: 'SEXTA-FEIRA',
+    title: 'SEX'
+  }
+
+]

@@ -23,54 +23,21 @@ const requiredText = "Campo obrigatório";
 
 const vehicleFormValidationSchema = zod.object({
   placa: zod.string().min(1, requiredText),
-  rodizio: zod.string().min(1, requiredText),
   capacidade: zod.string().min(1, requiredText),
   percentualCheio: zod.string().min(1, requiredText),
   qtdLocais: zod.string().min(1, requiredText),
-  codigoFrota: zod.string().min(1, requiredText)
+  codigoFrota: zod.string().min(1, requiredText),
+  prioridade: zod.string().min(1, requiredText),
 });
 
 type NewVehicleFormData = zod.infer<typeof vehicleFormValidationSchema>
-
-type DiaSemana = {
-  id: string;
-  name: string;
-  title: string;
-}
-const diasSemana: DiaSemana[] = [
-  {
-    id: '2',
-    name: 'SEGUNDA-FEIRA',
-    title: 'SEG'
-  },
-  {
-    id: '3',
-    name: 'TERÇA-FEIRA',
-    title: 'TER'
-  },
-  {
-    id: '4',
-    name: 'QUARTA-FEIRA',
-    title: 'QUA'
-  },
-  {
-    id: '5',
-    name: 'QUINTA-FEIRA',
-    title: 'QUI'
-  },
-  {
-    id: '6',
-    name: 'SEXTA-FEIRA',
-    title: 'SEX'
-  }
-
-]
 
 export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>();
   const [vehicleSelected, setVehicleSelected] = useState<number>();
   const [deliveries, setDeliveries] = useState<DeliveryPoints[]>();
+  const [temRodizio, setTemRodizio] = useState(0);
 
   const { id } = useParams();
 
@@ -129,11 +96,12 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
 
       const body: SaveVehicleDTO = {
         placa: data.placa,
-        rodizio: data.rodizio,
+        temRodizio: temRodizio === 1 ? true : false,
         capacidade: parseInt(data.capacidade),
         percentualCheio: parseInt(data.percentualCheio),
         qtdLocais: parseInt(data.qtdLocais),
-        codigoFrota: parseInt(data.codigoFrota)
+        codigoFrota: parseInt(data.codigoFrota),
+        prioridade: parseInt(data.prioridade)
       }
 
       setIsLoading(true);
@@ -163,11 +131,13 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
     setVehicleSelected(vehicle.id);
 
     setValue("placa", vehicle.placa);
-    setValue("rodizio", vehicle?.rodizio);
     setValue("capacidade", vehicle.capacidade?.toString());
     setValue("percentualCheio", vehicle.percentualCheio?.toString());
     setValue("qtdLocais", vehicle.qtdLocais?.toString());
     setValue("codigoFrota", vehicle.codigoFrota?.toString());
+    setValue("prioridade", vehicle.prioridade?.toString());
+
+    setTemRodizio(vehicle.temRodizio ? 1 : 0);
   }
 
   function getSumByKey(arr: any[], key: string | number) {
@@ -253,22 +223,6 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                               <div className="md:col-span-1">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Rodízio
-                                  </label>
-                                  <SelectInput<NewVehicleFormData>
-                                    id="rodizio"
-                                    name="rodizio"
-                                    className="mb-2"
-                                    options={diasSemana}
-                                    register={register}
-                                    errors={errors}
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="md:col-span-1">
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Capacidade(Kg)
                                   </label>
                                   <FormInput<NewVehicleFormData>
@@ -334,6 +288,40 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                                 </div>
                               </div>
 
+                              <div className="md:col-span-1">
+                                <div>
+                                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Prioridade
+                                  </label>
+                                  <FormInput<NewVehicleFormData>
+                                    id="prioridade"
+                                    type="number"
+                                    name="prioridade"
+                                    label="Prioridade"
+                                    className="mb-2"
+                                    register={register}
+                                    errors={errors}
+                                  />
+                                </div>
+                              </div>
+
+                              <div className="md:col-span-1">
+                                <div className="flex flex-row justify-center items-center gap-4 h-16">
+                                  <label className="block text-sm font-medium text-gray-700">
+                                    Rodízio?
+                                  </label>
+                                  <input
+                                    id="temRodizio"
+                                    name="temRodizio"
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    value={temRodizio}
+                                    checked={temRodizio === 1 ? true : false}
+                                    onChange={() => setTemRodizio(temRodizio === 1 ? 0 : 1)}
+                                  />
+                                </div>
+                              </div>
+
                               <div className="flex items-center md:col-span-1">
                                 <Button
                                   title="Adicionar"
@@ -358,19 +346,22 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                                         Placa
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Rodízio
-                                      </th>
-                                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Capacidade(Kg)
+                                        Cap.(Kg)
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Perc. Cheio(%)
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Máx Locais
+                                        Máx. Locais
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Cód. Frota
+                                      </th>
+                                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Prioridade
+                                      </th>
+                                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                        Rodízio
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Ativo
@@ -390,11 +381,12 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                                             {vehicle.placa}
                                           </a>
                                         </td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.rodizio}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.capacidade}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.percentualCheio}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.qtdLocais}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.codigoFrota}</td>
+                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.prioridade}</td>
+                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.temRodizio ? 'SIM' : 'NÃO'}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                           <Toggle enabled={vehicle.ativo!} handleChangeToggle={() => handleChangeStatus(vehicle.ativo!, vehicle.id)} />
                                         </td>

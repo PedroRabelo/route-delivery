@@ -25,4 +25,11 @@ export class Veiculo {
 
   @Column({ name: 'COD_FROTA' })
   codigoFrota: number;
+
+  @Column({ name: 'PRIORIDADE' })
+  prioridade: number;
+
+  @Column({ name: 'VERIFICA_RODIZIO' })
+  temRodizio: boolean;
+
 }

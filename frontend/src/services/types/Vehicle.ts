@@ -3,17 +3,19 @@ export type Vehicle = {
   placa: string;
   capacidade: number;
   ativo?: boolean;
-  rodizio: string;
+  temRodizio: boolean;
   percentualCheio: number;
   qtdLocais: number;
   codigoFrota: number;
+  prioridade: number;
 };
 
 export type SaveVehicleDTO = {
   placa: string;
   capacidade: number;
-  rodizio: string;
+  temRodizio: boolean;
   percentualCheio: number;
   qtdLocais: number;
   codigoFrota: number;
+  prioridade: number;
 }

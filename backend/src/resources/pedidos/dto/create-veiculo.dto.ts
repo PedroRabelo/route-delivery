@@ -13,9 +13,9 @@ export class CreateVeiculoDto {
   @IsOptional()
   ativo?: boolean;
 
-  @IsString()
-  @IsNotEmpty()
-  rodizio: string;
+  @IsBoolean()
+  @IsOptional()
+  temRodizio: boolean;
 
   @IsNumber()
   percentualCheio: number;
@@ -26,4 +26,8 @@ export class CreateVeiculoDto {
   @IsNumber()
   @IsOptional()
   codigoFrota: number;
+
+  @IsNumber()
+  @IsOptional()
+  prioridade: number;
 }
