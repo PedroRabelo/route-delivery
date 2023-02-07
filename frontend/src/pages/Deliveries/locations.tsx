@@ -205,7 +205,7 @@ export function DeliveryLocations() {
               <div className="md:col-span-1">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Entregas
+                    Qtd. Máxima
                   </label>
                   <FormInput<NewDeliveryFormData>
                     id="deliveries"
@@ -222,7 +222,7 @@ export function DeliveryLocations() {
               <div className="md:col-span-1">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Área(Km²)
+                    Distância(Km²)
                   </label>
                   <FormInput<NewDeliveryFormData>
                     id="area"

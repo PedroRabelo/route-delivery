@@ -148,6 +148,14 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
     return vehicles && vehicles.length > 0 ? vehicles?.filter((veh) => veh.ativo) : [];
   }
 
+  function filterLoadAvailable() {
+    let available: number = 0;
+    vehicles?.filter((veh) => veh.ativo).map(v => {
+      available = available + ((v.capacidade * v.percentualCheio) / 100);
+    })
+    return available;
+  }
+
   return (
     <Transition.Root show={openVehicles} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={() => handleCloseVehicles()}>
@@ -183,13 +191,26 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                           </div>
                         </div>
                       </div>
-                      <div className="relative mt-6 flex-1 px-4 sm:px-2">
+                      <div className="relative mt-2 flex-1 px-4 sm:px-2">
                         <div>
                           <div className='flex flex-row justify-between text-gray-900 font-medium'>
-                            <p>Qtd. veículos ativos: {vehicles?.filter((veh) => veh.ativo).length}</p>
-                            <p>Capacidade disponível: {formatNumber(getSumByKey(filterVehiclesActive(), 'capacidade'))}KG</p>
-                            <p>Peso total:</p>{deliveries?.length && <p>{formatNumber(getSumByKey(deliveries, 'peso'))}KG</p>}
-                            <p>Quantidade de entregas: {deliveries?.length}</p>
+                            <div className='flex gap-6 justify-between'>
+                              <div className='flex flex-col gap-1'>
+                                <span className='font-medium'>Veículos</span>
+                                <p>Total: {vehicles?.length}</p>
+                                <p>Ativos: {vehicles?.filter((veh) => veh.ativo).length}</p>
+                              </div>
+                              <div className='flex flex-col gap-1'>
+                                <span className='font-medium'>Capacidade</span>
+                                <p>Disponível: {formatNumber(getSumByKey(filterVehiclesActive(), 'capacidade'))}KG</p>
+                                <p>Liberada: {formatNumber(filterLoadAvailable())}KG</p>
+                              </div>
+                              <div className='flex flex-col gap-1'>
+                                <span className='font-medium'>Carga</span>
+                                <p>Peso total: {deliveries?.length && formatNumber(getSumByKey(deliveries, 'peso'))}KG</p>
+                                <p>Quantidade de entregas: {deliveries?.length}</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
 

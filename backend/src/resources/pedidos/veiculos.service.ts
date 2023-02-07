@@ -22,8 +22,11 @@ export class VeiculosService {
         throw new NotFoundException('Veículo já existe');
       }
 
+      const capacidadeLiberada = (createVeiculoDto.capacidade * createVeiculoDto.percentualCheio) / 100;
+
       const data = {
         ativo: true,
+        capacidadeLiberada,
         ...createVeiculoDto,
       };
 
@@ -57,7 +60,14 @@ export class VeiculosService {
         );
       }
 
-      this.veiculoRepository.update(veiculoId, updateVeiculoDto);
+      const capacidadeLiberada = (updateVeiculoDto.capacidade * updateVeiculoDto.percentualCheio) / 100;
+
+      const data = {
+        capacidadeLiberada,
+        ...updateVeiculoDto
+      }
+
+      this.veiculoRepository.update(veiculoId, data);
     } catch (error) {
       console.log(error);
       throw error;

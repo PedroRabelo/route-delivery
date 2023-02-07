@@ -209,6 +209,7 @@ export default function DeliveryVehicles({ trucks, handleFilterDeliveryPoints, h
               </tbody>
               <tfoot>
                 {trucks?.length && <tr className="text-gray-900">
+                  <th scope="row" className="py-3 font-semibold text-center"></th>
                   <th scope="row" className="py-3 font-semibold text-center">Total</th>
                   <td className="py-3 px-6 text-center">
                     {trucks?.length}

@@ -32,4 +32,7 @@ export class Veiculo {
   @Column({ name: 'VERIFICA_RODIZIO' })
   temRodizio: boolean;
 
+  @Column({ name: 'CAPACIDADE_LIBERADA' })
+  capacidadeLiberada: number;
+
 }
