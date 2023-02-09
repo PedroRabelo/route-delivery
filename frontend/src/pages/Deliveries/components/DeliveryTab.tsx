@@ -44,14 +44,13 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
             aria-current={tabSelected ? 'page' : undefined}
           >
             Entregues
-            {deliveries?.withTruck ? (
-              <span
-                className="text-green-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-sm font-medium md:inline-block"
-              >
-                {deliveries.withTruck}
-              </span>
-            ) : null}
-
+            <span
+              className="text-green-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-sm font-medium md:inline-block"
+            >
+              {deliveries?.withTruck ?
+                deliveries.withTruck
+                : 0}
+            </span>
           </a>
           <a
             onClick={() => {
@@ -65,14 +64,14 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
             aria-current={tabSelected ? 'page' : undefined}
           >
             Não Entregues
-            {deliveries?.withTruck ? (
-              <span
-                className="text-red-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-sm font-medium md:inline-block"
-              >
-                {deliveries.noTruck}
-              </span>
-            ) : null}
 
+            <span
+              className="text-red-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-sm font-medium md:inline-block"
+            >
+              {deliveries?.noTruck ?
+                deliveries.noTruck
+                : 0}
+            </span>
           </a>
         </nav>
       </div>

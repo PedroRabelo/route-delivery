@@ -6,9 +6,13 @@ export class PedidoParamsDto {
 
   @IsNotEmpty()
   @IsNumber()
-  deliveries: number;
+  distance: number;
 
   @IsNotEmpty()
   @IsNumber()
-  area: number;
+  area1: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  area2: number;
 }

@@ -20,8 +20,9 @@ import Vehicles from './components/Vehicles';
 const requiredText = "Campo obrigatório";
 
 const deliveryFormValidationSchema = zod.object({
-  deliveries: zod.string().min(1, requiredText),
-  area: zod.string().min(1, requiredText),
+  distance: zod.string().min(1, requiredText),
+  area1: zod.string().min(1, requiredText),
+  area2: zod.string().min(1, requiredText),
 });
 
 type NewDeliveryFormData = zod.infer<typeof deliveryFormValidationSchema>
@@ -114,8 +115,8 @@ export function DeliveryLocations() {
 
   async function exportDeliveries(params: NewDeliveryFormData) {
     try {
-      if (params.area === '' || params.deliveries === '') {
-        alert('Informe a quantidade de entregas e área máxima');
+      if (params.area1 === '' || params.area2 === '' || params.distance === '') {
+        alert('Informe a distância e os quadrantes');
         return;
       }
 
@@ -185,7 +186,7 @@ export function DeliveryLocations() {
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className="bg-white shadow sm:rounded-lg sm:p-4">
-            <div className="md:grid md:grid-cols-7 md:gap-6">
+            <div className="md:grid md:grid-cols-12 md:gap-6">
 
               <div className="md:col-span-2">
                 <div>
@@ -202,16 +203,16 @@ export function DeliveryLocations() {
                 </div>
               </div>
 
-              <div className="md:col-span-1">
+              <div className="md:col-span-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Qtd. Máxima
+                    Distância
                   </label>
                   <FormInput<NewDeliveryFormData>
-                    id="deliveries"
+                    id="distance"
                     type="text"
-                    name="deliveries"
-                    label="Entregas por caminhão"
+                    name="distance"
+                    label="Distância"
                     className="mb-2"
                     register={register}
                     errors={errors}
@@ -219,16 +220,16 @@ export function DeliveryLocations() {
                 </div>
               </div>
 
-              <div className="md:col-span-1">
+              <div className="md:col-span-2">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Distância(Km²)
+                    Quadrante 1(Km²)
                   </label>
                   <FormInput<NewDeliveryFormData>
-                    id="area"
+                    id="area1"
                     type="text"
-                    name="area"
-                    label="Área Máxima"
+                    name="area1"
+                    label="Quadrante 1"
                     className="mb-2"
                     register={register}
                     errors={errors}
@@ -236,7 +237,24 @@ export function DeliveryLocations() {
                 </div>
               </div>
 
-              <div className="flex flex-row items-center gap-2 md:col-span-3">
+              <div className="md:col-span-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Quadrante 2(Km²)
+                  </label>
+                  <FormInput<NewDeliveryFormData>
+                    id="area2"
+                    type="text"
+                    name="area2"
+                    label="Quadrante 2"
+                    className="mb-2"
+                    register={register}
+                    errors={errors}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-row items-center gap-2 md:col-span-4">
                 <div>
                   <Button
                     title="Calcular entregas"

@@ -130,13 +130,14 @@ export class PedidosService {
   async generateRoutes(params: PedidoParamsDto) {
     try {
       console.log(
-        `exec [RT_SP] '${params.startDate}', ${params.deliveries}, ${params.area}`,
+        `exec [RT_SP2] '${params.startDate}', ${params.distance}, ${params.area1}, ${params.area2}`,
       );
 
-      await this.pedidoRepository.query('exec [RT_SP] @0, @1, @2', [
+      await this.pedidoRepository.query('exec [RT_SP2] @0, @1, @2, @3', [
         params.startDate,
-        params.deliveries,
-        params.area,
+        params.distance,
+        params.area1,
+        params.area2,
       ]);
 
       return 'OK';
