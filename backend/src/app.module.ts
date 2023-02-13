@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -9,12 +10,13 @@ const timeout = 600000;
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mssql',
-      host: '3.230.101.136',
+      host: process.env.DATABASE_URL,
       port: 1433,
-      username: 'sistema',
-      password: 'dbaGest@',
+      username: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PWD,
       database: 'roterizador',
       autoLoadEntities: true,
       extra: {
@@ -35,4 +37,4 @@ const timeout = 600000;
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
