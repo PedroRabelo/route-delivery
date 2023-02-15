@@ -65,9 +65,6 @@ export class PedidosService {
         );
         roteiro = roteiroCadastrado;
 
-        console.log('Ja existe');
-        console.log(roteiro);
-
         roteiro.status = 'AGUARDANDO_LAT_LONG';
         await this.roteiroRepository.save(roteiro);
       } else {
@@ -75,19 +72,12 @@ export class PedidosService {
         novoRoteiro.dataEntrega = dataFormatada;
         novoRoteiro.status = 'AGUARDANDO_LAT_LONG';
 
-        console.log(novoRoteiro);
-
-
         await this.roteiroRepository.save(novoRoteiro);
         roteiro = novoRoteiro;
       }
 
-      console.log('salvou roteiro');
-
       roteiro.pedidos = [];
       for await (const dto of createPedidoDto) {
-        console.log(dto.entrega);
-
         const pedido = new Pedido(dto);
         pedido.roteiro = roteiro;
         roteiro.pedidos.push(pedido);
@@ -107,8 +97,6 @@ export class PedidosService {
         };
       } catch (error) {
         console.log(error);
-
-        console.log(createPedidoDto);
         throw error;
       }
     } catch (error) {

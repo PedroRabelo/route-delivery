@@ -17,7 +17,7 @@ const timeout = 600000;
       port: 1433,
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PWD,
-      database: 'roterizador',
+      database: process.env.DATABASE_NAME,
       autoLoadEntities: true,
       extra: {
         validateConnection: false,
