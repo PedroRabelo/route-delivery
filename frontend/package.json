@@ -28,6 +28,7 @@
     "zod": "^3.19.1"
   },
   "devDependencies": {
+    "@types/google.maps": "^3.52.0",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.1.0",

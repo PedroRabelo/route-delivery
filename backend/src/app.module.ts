@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PedidosModule } from './resources/pedidos/pedidos.module';
+import { ZonasModule } from './resources/zonas/zonas.module';
 
 const timeout = 600000;
 
@@ -33,6 +34,7 @@ const timeout = 600000;
     }),
     ScheduleModule.forRoot(),
     PedidosModule,
+    ZonasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

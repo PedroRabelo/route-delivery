@@ -10,7 +10,7 @@ interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
 }
 
-export function Map({ deliveryPoints }: MapProps) {
+export function MapLocations({ deliveryPoints }: MapProps) {
   const mapRef = useRef<GoogleMap>();
   const center = useMemo<LatLngLiteral>(
     () => ({ lat: -23.5298971, lng: -46.749152 }),

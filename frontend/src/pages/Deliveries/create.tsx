@@ -7,7 +7,7 @@ import { utils, writeFile } from 'xlsx';
 import * as zod from 'zod';
 import { Button } from "../../components/Button";
 import { FormInput } from "../../components/Form";
-import { Map } from '../../components/Maps';
+import { MapLocations } from '../../components/Maps';
 import { api } from '../../lib/axios';
 import { DeliveryPoints, DeliveryRoute, DeliveryVehicle } from '../../services/types/Delivery';
 import { formatDateOnly } from '../../services/utils/formatDateOnly';
@@ -207,7 +207,7 @@ export function CreateDelivery() {
       </form>
 
       <div className='flex-1 grow'>
-        <Map deliveryPoints={deliveriesByTruck} />
+        <MapLocations deliveryPoints={deliveriesByTruck} />
       </div>
 
       <DeliveryTable

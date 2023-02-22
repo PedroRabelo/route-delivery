@@ -7,7 +7,7 @@ import { utils, writeFile } from 'xlsx';
 import * as zod from 'zod';
 import { Button } from "../../components/Button";
 import { FormInput } from "../../components/Form";
-import { Map } from '../../components/Maps';
+import { MapLocations } from '../../components/Maps';
 import { api } from '../../lib/axios';
 import { DeliveryPoints, DeliveryRoute, DeliveryVehicle, VehicleDeliveries } from '../../services/types/Delivery';
 import { formatDateOnly } from '../../services/utils/formatDateOnly';
@@ -175,8 +175,8 @@ export function DeliveryLocations() {
   return (
     <div className="flex gap-2">
       <div className="container">
-        <div className='flex-1 grow h-[85vh]'>
-          <Map deliveryPoints={deliveriesByTruck} />
+        <div className='flex-1 grow h-[88vh]'>
+          <MapLocations deliveryPoints={deliveriesByTruck} />
         </div>
       </div>
       <div className="container flex-col">
