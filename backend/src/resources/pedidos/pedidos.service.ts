@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { convertLatLongFloat } from 'src/common/utils/convertLatLongFloat';
 import { slicePedidosIntoChunks } from 'src/common/utils/sliceArrayIntoChunks';
@@ -23,15 +22,24 @@ export class PedidosService {
 
   async create(createPedidoDto: CreatePedidoDto[]) {
     try {
-      const dataEntregaString = createPedidoDto[0].entrega.toString();
+      let dataFormatada: Date;
 
-      const dataEntregaSplit = dataEntregaString.split('/');
+      console.log(createPedidoDto[0].entrega instanceof Date);
 
-      const dataFormatada = new Date(
-        +dataEntregaSplit[2],
-        +dataEntregaSplit[1] - 1,
-        +dataEntregaSplit[0],
-      );
+
+      if (createPedidoDto[0].entrega instanceof Date) {
+        dataFormatada = createPedidoDto[0].entrega;
+      } else {
+        const dataEntregaString = (createPedidoDto[0].entrega as string).toString();
+
+        const dataEntregaSplit = dataEntregaString.split('/');
+
+        dataFormatada = new Date(
+          +dataEntregaSplit[2],
+          +dataEntregaSplit[1] - 1,
+          +dataEntregaSplit[0],
+        );
+      }
 
       for await (const pedido of createPedidoDto) {
         const pedidoValido = validadeFileData(pedido);
@@ -52,6 +60,8 @@ export class PedidosService {
 
         pedidoValido.entrega = dataFormatada;
       }
+
+      console.log(dataFormatada);
 
       const roteiroCadastrado = await this.roteiroRepository.findOne({
         where: { dataEntrega: dataFormatada },
@@ -90,6 +100,8 @@ export class PedidosService {
           await this.pedidoRepository.save(pedidos);
         });
 
+        // this.getEnderecosPedidos(roteiro.id);
+
         return {
           id: roteiro.id,
           data: roteiro.dataEntrega,
@@ -105,10 +117,12 @@ export class PedidosService {
     }
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
-  getEnderecosPedidos() {
+  //@Cron(CronExpression.EVERY_MINUTE)
+  getEnderecosPedidos(roteiroId: number) {
     try {
-      this.roteiroRepository.query('exec [SP_ProcessaCadastroLocais]');
+      console.log(`exec [VERIFICA_CADASTRO] ${roteiroId}`);
+
+      this.roteiroRepository.query('exec [VERIFICA_CADASTRO] @0', [roteiroId]);
     } catch (error) {
       console.log(error);
       throw error;

@@ -75,6 +75,11 @@ export class PedidosController {
     return this.pedidosService.create(jsonFormatted);
   }
 
+  @Get('verifica-cadastro/:roteiroId')
+  async verificaCadastro(@Param('roteiroId') roteiroId: number) {
+    return this.pedidosService.getEnderecosPedidos(roteiroId);
+  }
+
   @Post()
   create(@Body() createPedidoDto: CreatePedidoDto[]) {
     return this.pedidosService.create(createPedidoDto);
