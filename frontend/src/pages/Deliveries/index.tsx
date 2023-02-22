@@ -55,12 +55,14 @@ export default function Deliveries() {
           setIsLoading(false);
           setFile(undefined);
           getRoutes();
+          api.get(`/pedidos/verifica-cadastro/${res.data.id}`);
         })
         .catch((e) => {
           console.log(e.response.data.message);
           alert(e.message);
           setIsLoading(false);
         });
+
     } catch (error) {
       console.log('Ocorreu um erro ao importar o arquivo');
     }
