@@ -5,9 +5,12 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormInput } from "../../components/Form";
 import { Button } from "../../components/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { Zone } from "../../services/types/Zone";
+import { CreateZoneCoordsDTO, CreateZoneDTO, Zone } from "../../services/types/Zone";
+import { api } from "../../lib/axios";
+import { DataTableActions } from "../../components/DataTable/data-table-actions";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 const libraries: (
   | "places"
@@ -20,7 +23,7 @@ const libraries: (
 const requiredText = "Campo obrigatório";
 
 const zoneFormValidationSchema = zod.object({
-  title: zod.string().min(1, requiredText),
+  titulo: zod.string().min(1, requiredText),
 })
 
 type NewZoneFormData = zod.infer<typeof zoneFormValidationSchema>
@@ -34,24 +37,74 @@ export default function Zones() {
   const [isLoading, setIsLoading] = useState(false);
   const [zones, setZones] = useState<Zone[]>([]);
   const [zoneSelected, setZoneSelected] = useState<number>();
+  const [bounds, setBounds] = useState<Bound[]>([]);
+  const [clearMap, setClearMap] = useState(false);
 
   const newZoneForm = useForm<NewZoneFormData>({
     resolver: zodResolver(zoneFormValidationSchema),
   })
 
-  const { formState: { errors }, handleSubmit, register, getValues } = newZoneForm
+  const { formState: { errors }, handleSubmit, register, reset } = newZoneForm
+
+  async function getZones() {
+    try {
+      const response = await api.get('zonas')
+      setZones(response.data);
+    } catch (error: any) {
+      alert(error.message)
+    }
+  }
+
+  useEffect(() => {
+    getZones();
+  }, []);
 
   const onSubmit: SubmitHandler<NewZoneFormData> = async (data) => {
-    console.log(data);
+    if (bounds?.length === 0) {
+      alert('Informe a área no mapa');
+      return;
+    }
 
-    // TODO continuar aqui - criar estrutura no banco e criar endpoint
+    try {
+      const coords: CreateZoneCoordsDTO[] = [];
+
+      bounds.map((bound) => {
+        coords.push({
+          latitude: parseFloat(bound.lat),
+          longitude: parseFloat(bound.lng)
+        })
+      })
+
+      const body: CreateZoneDTO = {
+        titulo: data.titulo,
+        coordenadas: coords
+      }
+
+      setIsLoading(true);
+
+      // await api.post('zonas', body);
+
+      getZones();
+      reset();
+      setClearMap(true);
+
+      setIsLoading(false);
+    } catch (e: any) {
+      setIsLoading(false);
+      console.log(e);
+      alert(e.response.data.message);
+    }
   }
 
   function handleEditZone(zone: Zone) { }
 
-  function getBounds(bounds: Bound[]) {
-    console.log(bounds);
-
+  async function deleteZone(id: number) {
+    try {
+      await api.delete(`zonas/${id}`)
+      getZones();
+    } catch (error: any) {
+      alert(error.message)
+    }
   }
 
   if (!isLoaded) return <div>Loading...</div>;
@@ -61,8 +114,9 @@ export default function Zones() {
       <div className="col-span-3">
         <div className='flex-1 grow h-[88vh]'>
           <MapDrawing
-            handleSetBounds={(bounds) => getBounds(bounds)}
+            handleSetBounds={(bounds) => setBounds(bounds)}
             polygonPath={[]}
+            clearMap={clearMap}
           />
         </div>
       </div>
@@ -82,7 +136,7 @@ export default function Zones() {
                   <FormInput<NewZoneFormData>
                     id="title"
                     type="text"
-                    name="title"
+                    name="titulo"
                     label="Título"
                     className="mb-2"
                     register={register}
@@ -116,6 +170,12 @@ export default function Zones() {
                       <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                         Nome
                       </th>
+                      <th
+                        scope="col"
+                        className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                      >
+                        <span className="sr-only">Remover</span>
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
@@ -129,6 +189,15 @@ export default function Zones() {
                               "cursor-pointer text-base font-bold")}
                             onClick={() => handleEditZone(zone)}>
                             {zone.titulo}
+                          </a>
+                        </td>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                          <a
+                            className="flex flex-col items-center text-red-600 hover:text-red-900 cursor-pointer"
+                            onClick={() => deleteZone(zone.id)}
+                          >
+                            <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                            <span className="text-xs">Remover</span>
                           </a>
                         </td>
                       </tr>
