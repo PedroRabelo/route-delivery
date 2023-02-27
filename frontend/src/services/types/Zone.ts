@@ -1,6 +1,7 @@
 export type Zone = {
   id: number;
   titulo: string;
+  coordenadas: ZoneCoords[];
 }
 
 export type ZoneCoords = {

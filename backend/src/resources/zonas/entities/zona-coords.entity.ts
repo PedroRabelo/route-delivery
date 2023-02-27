@@ -13,7 +13,10 @@ export class ZonaCoords {
   @Column({ name: 'longitude', type: 'float' })
   longitude: number;
 
-  @ManyToOne(() => Zona, (roteiro) => roteiro.coordenadas)
+  @Column({ name: "zona_id" })
+  zonaId: number;
+
+  @ManyToOne(() => Zona, (zona) => zona.coordenadas)
   @JoinColumn({ name: "zona_id" })
   zona: Zona;
 }

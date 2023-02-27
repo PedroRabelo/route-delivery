@@ -41,7 +41,6 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
 
   const { id } = useParams();
 
-
   const newVehicleForm = useForm<NewVehicleFormData>({
     resolver: zodResolver(vehicleFormValidationSchema),
   })

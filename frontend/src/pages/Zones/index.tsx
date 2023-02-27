@@ -7,7 +7,7 @@ import { FormInput } from "../../components/Form";
 import { Button } from "../../components/Button";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { CreateZoneCoordsDTO, CreateZoneDTO, Zone } from "../../services/types/Zone";
+import { CreateZoneCoordsDTO, CreateZoneDTO, Zone, ZoneCoords } from "../../services/types/Zone";
 import { api } from "../../lib/axios";
 import { DataTableActions } from "../../components/DataTable/data-table-actions";
 import { TrashIcon } from "@heroicons/react/24/outline";
@@ -38,13 +38,12 @@ export default function Zones() {
   const [zones, setZones] = useState<Zone[]>([]);
   const [zoneSelected, setZoneSelected] = useState<number>();
   const [bounds, setBounds] = useState<Bound[]>([]);
-  const [clearMap, setClearMap] = useState(false);
 
   const newZoneForm = useForm<NewZoneFormData>({
     resolver: zodResolver(zoneFormValidationSchema),
   })
 
-  const { formState: { errors }, handleSubmit, register, reset } = newZoneForm
+  const { formState: { errors }, handleSubmit, register, setValue } = newZoneForm
 
   async function getZones() {
     try {
@@ -70,8 +69,8 @@ export default function Zones() {
 
       bounds.map((bound) => {
         coords.push({
-          latitude: parseFloat(bound.lat),
-          longitude: parseFloat(bound.lng)
+          latitude: bound.lat,
+          longitude: bound.lng
         })
       })
 
@@ -82,11 +81,16 @@ export default function Zones() {
 
       setIsLoading(true);
 
-      // await api.post('zonas', body);
+      if (zoneSelected) {
+        await api.put(`zonas/${zoneSelected}`, body);
 
-      getZones();
-      reset();
-      setClearMap(true);
+        setZoneSelected(undefined);
+      } else {
+        await api.post('zonas', body);
+      }
+
+      window.location.reload();
+      setBounds([]);
 
       setIsLoading(false);
     } catch (e: any) {
@@ -96,7 +100,21 @@ export default function Zones() {
     }
   }
 
-  function handleEditZone(zone: Zone) { }
+  function handleEditZone(zone: Zone) {
+    const coords: Bound[] = []
+    zone.coordenadas.map((coord) => {
+      coords.push({
+        lat: coord.latitude,
+        lng: coord.longitude
+      })
+    })
+
+    setBounds(coords);
+
+    setValue("titulo", zone.titulo);
+
+    setZoneSelected(zone.id);
+  }
 
   async function deleteZone(id: number) {
     try {
@@ -115,8 +133,7 @@ export default function Zones() {
         <div className='flex-1 grow h-[88vh]'>
           <MapDrawing
             handleSetBounds={(bounds) => setBounds(bounds)}
-            polygonPath={[]}
-            clearMap={clearMap}
+            polygonPath={bounds}
           />
         </div>
       </div>
