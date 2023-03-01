@@ -14,7 +14,7 @@ export class ZonasService {
     @InjectRepository(Zona)
     private zonaRepository: Repository<Zona>,
     @InjectRepository(ZonaCoords)
-    private zonaCoordsRepository: Repository<ZonaCoords>
+    private zonaCoordsRepository: Repository<ZonaCoords>,
   ) { }
 
   async create(createZonaDto: CreateZonaDto) {

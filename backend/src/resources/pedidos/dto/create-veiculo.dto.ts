@@ -30,4 +30,8 @@ export class CreateVeiculoDto {
   @IsNumber()
   @IsOptional()
   prioridade: number;
+
+  @IsNumber()
+  @IsOptional()
+  pesoMinimo: number;
 }

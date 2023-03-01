@@ -8,6 +8,7 @@ export type Vehicle = {
   qtdLocais: number;
   codigoFrota: number;
   prioridade: number;
+  pesoMinimo: number;
 };
 
 export type SaveVehicleDTO = {
@@ -18,4 +19,10 @@ export type SaveVehicleDTO = {
   qtdLocais: number;
   codigoFrota: number;
   prioridade: number;
+  pesoMinimo: number;
+}
+
+export type AddZoneVehicleDTO = {
+  zonaId: number;
+  veiculoId: number;
 }

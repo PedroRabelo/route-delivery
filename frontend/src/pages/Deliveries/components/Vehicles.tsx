@@ -28,6 +28,7 @@ const vehicleFormValidationSchema = zod.object({
   qtdLocais: zod.string().min(1, requiredText),
   codigoFrota: zod.string().min(1, requiredText),
   prioridade: zod.string().min(1, requiredText),
+  pesoMinimo: zod.string().min(1, requiredText),
 });
 
 type NewVehicleFormData = zod.infer<typeof vehicleFormValidationSchema>
@@ -100,7 +101,8 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
         percentualCheio: parseInt(data.percentualCheio),
         qtdLocais: parseInt(data.qtdLocais),
         codigoFrota: parseInt(data.codigoFrota),
-        prioridade: parseInt(data.prioridade)
+        prioridade: parseInt(data.prioridade),
+        pesoMinimo: parseInt(data.pesoMinimo)
       }
 
       setIsLoading(true);
@@ -135,6 +137,7 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
     setValue("qtdLocais", vehicle.qtdLocais?.toString());
     setValue("codigoFrota", vehicle.codigoFrota?.toString());
     setValue("prioridade", vehicle.prioridade?.toString());
+    setValue("pesoMinimo", vehicle.pesoMinimo?.toString());
 
     setTemRodizio(vehicle.temRodizio ? 1 : 0);
   }

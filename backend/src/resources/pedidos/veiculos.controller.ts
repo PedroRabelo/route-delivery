@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import { CreateVeiculoZonaDto } from '../zonas/dto/create-veiculo-zona.dto';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 import { VeiculosService } from './veiculos.service';
 
 @Controller('veiculos')
 export class VeiculosController {
-  constructor(private readonly veiculosService: VeiculosService) {}
+  constructor(private readonly veiculosService: VeiculosService) { }
 
   @Post()
   create(@Body() createVeiculoDto: CreateVeiculoDto) {
@@ -31,5 +32,20 @@ export class VeiculosController {
     @Body() updateVeiculoDto: UpdateVeiculoDto,
   ) {
     return this.veiculosService.updateVeiculo(+id, updateVeiculoDto);
+  }
+
+  @Post('zona')
+  createVeiculoZona(@Body() createVeiculoZonaDto: CreateVeiculoZonaDto) {
+    return this.veiculosService.saveVeiculoZona(createVeiculoZonaDto);
+  }
+
+  @Get('zonas/:veiculoId')
+  getVeiculoZonas(@Param('veiculoId') veiculoId: string) {
+    return this.veiculosService.getAllZonas(+veiculoId);
+  }
+
+  @Delete(':veiculoId/zona/:id')
+  deleteZona(@Param('veiculoId') veiculoId: string, @Param('id') id: string) {
+    return this.veiculosService.removeVeiculoZona(+veiculoId, +id);
   }
 }

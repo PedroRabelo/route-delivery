@@ -1,0 +1,1 @@
+ALTER TABLE roteirizador.dbo.VEICULOS ADD PESO_MINIMO int NULL;

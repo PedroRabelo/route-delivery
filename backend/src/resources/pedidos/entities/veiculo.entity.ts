@@ -35,4 +35,7 @@ export class Veiculo {
   @Column({ name: 'CAPACIDADE_LIBERADA' })
   capacidadeLiberada: number;
 
+  @Column({ name: 'PESO_MINIMO' })
+  pesoMinimo: number;
+
 }
