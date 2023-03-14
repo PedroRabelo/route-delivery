@@ -10,4 +10,7 @@ export class VeiculoZona {
 
   @Column({ name: "veiculo_id" })
   veiculoId: number;
+
+  @Column(({ name: "prioridade" }))
+  prioridade: number;
 }

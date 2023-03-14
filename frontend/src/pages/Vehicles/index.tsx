@@ -1,3 +1,4 @@
+import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
@@ -5,9 +6,10 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as zod from 'zod';
 import { Button } from "../../components/Button";
 import { FormInput } from "../../components/Form";
+import { Input } from "../../components/Input";
 import { Toggle } from "../../components/Toggle/Toggle";
 import { api } from "../../lib/axios";
-import { AddZoneVehicleDTO, SaveVehicleDTO, Vehicle } from "../../services/types/Vehicle";
+import { AddZoneVehicleDTO, SaveVehicleDTO, Vehicle, VehicleZone } from "../../services/types/Vehicle";
 import { Zone } from "../../services/types/Zone";
 import { formatNumber } from "../../services/utils/formatNumber";
 const requiredText = "Campo obrigatório";
@@ -30,8 +32,11 @@ export function Vehicles() {
   const [vehicleSelected, setVehicleSelected] = useState<number>();
   const [isLoading, setIsLoading] = useState(false);
   const [temRodizio, setTemRodizio] = useState(0);
-  const [vehicleZones, setVehicleZones] = useState<Zone[]>([]);
+  const [vehicleZones, setVehicleZones] = useState<VehicleZone[]>([]);
   const [zoneSelected, setZoneSelected] = useState<number>(-1);
+  const [priority, setPriority] = useState(0);
+  const [newPriority, setNewPriority] = useState(0);
+  const [rowIndex, setRowIndex] = useState(-1);
 
   const newVehicleForm = useForm<NewVehicleFormData>({
     resolver: zodResolver(vehicleFormValidationSchema),
@@ -67,7 +72,17 @@ export function Vehicles() {
       const response = await api.get(`/veiculos/zonas/${vehicleId}`);
 
       if (response.data) {
-        setVehicleZones(zones.filter((zone) => response.data.includes(zone.id)));
+        // setVehicleZones(zones.filter((zone) => response.data.includes(zone.id)));
+
+        const vehicleZones: VehicleZone[] = [];
+        await response.data.forEach((zone: VehicleZone) => {
+          vehicleZones.push({
+            zonaId: zone.zonaId,
+            zona: zones.find((z) => z.id === zone.zonaId)?.titulo!,
+            prioridade: zone.prioridade
+          })
+        });
+        setVehicleZones(vehicleZones);
       }
     } catch (error: any) {
       alert(error.message)
@@ -144,19 +159,22 @@ export function Vehicles() {
 
   async function handleAddZone() {
     try {
-      if (vehicleZones.length > 0 && vehicleZones.some((zone) => zone.id === zoneSelected)) {
+      if (vehicleZones.length > 0 && vehicleZones.some((zone) => zone.zonaId === zoneSelected)) {
         alert('Zona já adicionada');
         return;
       }
 
       const body: AddZoneVehicleDTO = {
         zonaId: zoneSelected,
-        veiculoId: vehicleSelected!
+        veiculoId: vehicleSelected!,
+        prioridade: priority
       }
 
       await api.post('veiculos/zona', body);
 
       getVehicleZones(vehicleSelected!);
+      setZoneSelected(0);
+      setPriority(0);
     } catch (error: any) {
       alert(error.message)
     }
@@ -166,6 +184,23 @@ export function Vehicles() {
     try {
       await api.delete(`veiculos/${vehicleSelected}/zona/${zoneId}`);
       getVehicleZones(vehicleSelected!);
+    } catch (error: any) {
+      alert(error.message)
+    }
+  }
+
+  function handleEditPriority(oldPriority: number, index: number) {
+    setRowIndex(index);
+    setNewPriority(oldPriority);
+  }
+
+  async function handleSavePriority(zoneId: number) {
+    try {
+      await api.patch(`veiculos/zonas/${vehicleSelected}/${zoneId}`, { prioridade: newPriority });
+      getVehicleZones(vehicleSelected!);
+
+      setNewPriority(0);
+      setRowIndex(-1);
     } catch (error: any) {
       alert(error.message)
     }
@@ -416,10 +451,10 @@ export function Vehicles() {
         </form>
 
         <div className="bg-white shadow sm:rounded-lg sm:p-4 mt-4">
-          <div className="flex gap-4">
+          <div className="grid grid-cols-6 gap-4">
             <select
               id="zones"
-              className="relative inline-flex p-3 text-base w-full rounded-md leading-none transition-colors ease-in-out placeholder-gray-500 text-gray-700 bg-gray-50 border border-gray-300 hover:border-blue-400 focus:outline-none focus:border-blue-400 focus:ring-blue-400 focus:ring-4 focus:ring-opacity-30"
+              className="col-span-4 relative inline-flex p-3 text-base w-full rounded-md leading-none transition-colors ease-in-out placeholder-gray-500 text-gray-700 bg-gray-50 border border-gray-300 hover:border-blue-400 focus:outline-none focus:border-blue-400 focus:ring-blue-400 focus:ring-4 focus:ring-opacity-30"
               onChange={(item) => setZoneSelected(+item.target.value)}
               disabled={vehicleSelected === undefined}
             >
@@ -434,7 +469,17 @@ export function Vehicles() {
                   </option>
                 ))}
             </select>
-            <div className="flex items-center md:col-span-1">
+            <Input
+              id="priority"
+              label="Prioridade"
+              name="priority"
+              className="col-span-1"
+              placeholder="Prioridade"
+              value={priority}
+              type="number"
+              onChange={(value) => setPriority(+value.target.value)}
+            />
+            <div className="flex items-center col-span-1">
               <Button
                 title="Adicionar"
                 color="primary"
@@ -445,24 +490,85 @@ export function Vehicles() {
               />
             </div>
           </div>
-          <div className="flex mt-4 gap-4">
-            {vehicleZones && vehicleZones.length > 0 && vehicleZones.map((zone) =>
-              <span
-                key={zone.id}
-                className="inline-flex items-center rounded-full bg-indigo-100 py-0.5 pl-2.5 pr-1 text-sm font-medium text-indigo-700">
-                {zone.titulo}
-                <button
-                  type="button"
-                  className="ml-0.5 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:bg-indigo-500 focus:text-white focus:outline-none"
-                  onClick={() => handleRemoveZone(zone.id)}
-                >
-                  <span className="sr-only">Remove Zone</span>
-                  <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
-                    <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
-                  </svg>
-                </button>
-              </span>
-            )}
+          <div className="mt-8 flex flex-col">
+            <h2 className="font-semibold pb-2">Zonas cadastradas</h2>
+            <div>
+              <div className="inline-block min-w-full align-middle">
+                <div className="relative overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                  <table className="min-w-full divide-y divide-gray-300">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                          Nome
+                        </th>
+                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                          Prioridade
+                        </th>
+                        <th
+                          scope="col"
+                          className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                        >
+                          <span className="sr-only">Remover</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 bg-white">
+                      {vehicleZones && vehicleZones?.length > 0 && vehicleZones.map((zone, index) => (
+                        <tr key={zone.zonaId}>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                            {zone.zona}
+                          </td>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                            {rowIndex !== index && zone.prioridade}
+                            {rowIndex >= 0 && rowIndex === index &&
+                              <Input
+                                id="newPriority"
+                                label="Prioridade"
+                                name="newPriority"
+                                value={newPriority}
+                                type="number"
+                                onChange={(value) => setNewPriority(+value.target.value)}
+                              />
+                            }
+                          </td>
+                          <td className="whitespace-nowrap py-4 pl-4 sm:pl-6">
+                            <div className="flex flex-row gap-4">
+                              {rowIndex === index &&
+                                <a
+                                  className="flex flex-col items-center text-grey-600 hover:text-grey-900 cursor-pointer"
+                                  onClick={() => handleSavePriority(zone.zonaId)}
+                                >
+                                  <PencilSquareIcon className="h-5 w-5" aria-hidden="true" />
+                                  <span className="text-xs">Salvar</span>
+                                </a>
+                              }
+
+                              {rowIndex !== index &&
+                                <a
+                                  className="flex flex-col items-center text-grey-600 hover:text-grey-900 cursor-pointer"
+                                  onClick={() => handleEditPriority(zone.prioridade, index)}
+                                >
+                                  <PencilSquareIcon className="h-5 w-5" aria-hidden="true" />
+                                  <span className="text-xs">Editar</span>
+                                </a>
+                              }
+
+                              <a
+                                className="flex flex-col items-center text-red-600 hover:text-red-900 cursor-pointer"
+                                onClick={() => handleRemoveZone(zone.zonaId)}
+                              >
+                                <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                                <span className="text-xs">Remover</span>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

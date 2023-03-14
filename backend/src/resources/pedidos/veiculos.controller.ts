@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { CreateVeiculoZonaDto } from '../zonas/dto/create-veiculo-zona.dto';
+import { UpdateVeiculoZonaDto } from '../zonas/dto/update-veiculo-zona.dto';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
 import { VeiculosService } from './veiculos.service';
@@ -37,6 +38,15 @@ export class VeiculosController {
   @Post('zona')
   createVeiculoZona(@Body() createVeiculoZonaDto: CreateVeiculoZonaDto) {
     return this.veiculosService.saveVeiculoZona(createVeiculoZonaDto);
+  }
+
+  @Patch('zonas/:veiculoId/:zonaId')
+  updateZonaVeiculo(
+    @Param('veiculoId') id: string,
+    @Param('zonaId') zonaId: string,
+    @Body() updateVeiculoZonaDto: UpdateVeiculoZonaDto,
+  ) {
+    return this.veiculosService.updateZonaVeiculo(+id, +zonaId, updateVeiculoZonaDto);
   }
 
   @Get('zonas/:veiculoId')

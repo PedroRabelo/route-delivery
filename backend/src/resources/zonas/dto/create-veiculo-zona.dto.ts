@@ -6,4 +6,7 @@ export class CreateVeiculoZonaDto {
 
   @IsNumber()
   veiculoId: number;
+
+  @IsNumber()
+  prioridade: number;
 }

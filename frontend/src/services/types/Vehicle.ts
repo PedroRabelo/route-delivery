@@ -11,6 +11,12 @@ export type Vehicle = {
   pesoMinimo: number;
 };
 
+export type VehicleZone = {
+  zonaId: number;
+  zona: string;
+  prioridade: number;
+}
+
 export type SaveVehicleDTO = {
   placa: string;
   capacidade: number;
@@ -25,4 +31,9 @@ export type SaveVehicleDTO = {
 export type AddZoneVehicleDTO = {
   zonaId: number;
   veiculoId: number;
+  prioridade: number;
+}
+
+export type UpdateZoneVehicleDTO = {
+  prioridade: number
 }

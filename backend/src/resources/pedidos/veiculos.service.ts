@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateVeiculoZonaDto } from '../zonas/dto/create-veiculo-zona.dto';
+import { UpdateVeiculoZonaDto } from '../zonas/dto/update-veiculo-zona.dto';
 import { VeiculoZona } from '../zonas/entities/veiculo-zona.entity';
 import { CreateVeiculoDto } from './dto/create-veiculo.dto';
 import { UpdateVeiculoDto } from './dto/update-veiculo.dto';
@@ -108,6 +109,26 @@ export class VeiculosService {
     }
   }
 
+  async updateZonaVeiculo(
+    veiculoId: number,
+    zonaId: number,
+    updateVeiculoZonaDto: UpdateVeiculoZonaDto,
+  ) {
+    try {
+      const veiculoZona = await this.veiculoZonaRepository.findOne({
+        where: {
+          veiculoId,
+          zonaId
+        }
+      })
+
+      await this.veiculoZonaRepository.update(veiculoZona, updateVeiculoZonaDto);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async getAllZonas(veiculoId: number) {
     try {
       const response = await this.veiculoZonaRepository.find({
@@ -115,12 +136,16 @@ export class VeiculosService {
           veiculoId
         },
         select: {
-          zonaId: true
+          zonaId: true,
+          prioridade: true
+        },
+        order: {
+          prioridade: 'ASC'
         }
       });
 
-      const zones = response.map((zone) => zone['zonaId'])
-      return zones;
+      // const zones = response.map((zone) => zone['zonaId'])
+      return response;
     } catch (error) {
       console.log(error);
       throw error;
