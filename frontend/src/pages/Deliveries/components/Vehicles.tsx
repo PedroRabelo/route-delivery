@@ -27,7 +27,7 @@ const vehicleFormValidationSchema = zod.object({
   percentualCheio: zod.string().min(1, requiredText),
   qtdLocais: zod.string().min(1, requiredText),
   codigoFrota: zod.string().min(1, requiredText),
-  prioridade: zod.string().min(1, requiredText),
+  qtdMinLocais: zod.string().min(1, requiredText),
   pesoMinimo: zod.string().min(1, requiredText),
 });
 
@@ -101,7 +101,7 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
         percentualCheio: parseInt(data.percentualCheio),
         qtdLocais: parseInt(data.qtdLocais),
         codigoFrota: parseInt(data.codigoFrota),
-        prioridade: parseInt(data.prioridade),
+        qtdMinLocais: parseInt(data.qtdMinLocais),
         pesoMinimo: parseInt(data.pesoMinimo)
       }
 
@@ -136,7 +136,7 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
     setValue("percentualCheio", vehicle.percentualCheio?.toString());
     setValue("qtdLocais", vehicle.qtdLocais?.toString());
     setValue("codigoFrota", vehicle.codigoFrota?.toString());
-    setValue("prioridade", vehicle.prioridade?.toString());
+    setValue("qtdMinLocais", vehicle.qtdMinLocais?.toString());
     setValue("pesoMinimo", vehicle.pesoMinimo?.toString());
 
     setTemRodizio(vehicle.temRodizio ? 1 : 0);
@@ -297,13 +297,13 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                               <div className="md:col-span-1">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Cód. Frota
+                                    Min. Locais
                                   </label>
                                   <FormInput<NewVehicleFormData>
-                                    id="codFrota"
+                                    id="qtdMinLocais"
                                     type="number"
-                                    name="codigoFrota"
-                                    label="Cod. Frota"
+                                    name="qtdMinLocais"
+                                    label="Min. Locais"
                                     className="mb-2"
                                     register={register}
                                     errors={errors}
@@ -314,13 +314,13 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                               <div className="md:col-span-1">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Prioridade
+                                    Cód. Frota
                                   </label>
                                   <FormInput<NewVehicleFormData>
-                                    id="prioridade"
+                                    id="codFrota"
                                     type="number"
-                                    name="prioridade"
-                                    label="Prioridade"
+                                    name="codigoFrota"
+                                    label="Cod. Frota"
                                     className="mb-2"
                                     register={register}
                                     errors={errors}
@@ -378,10 +378,10 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                                         Máx. Locais
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Cód. Frota
+                                        Min. Locais
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                                        Prioridade
+                                        Cód. Frota
                                       </th>
                                       <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                                         Rodízio
@@ -407,8 +407,8 @@ export default function Vehicles({ handleCloseVehicles, openVehicles }: Props) {
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.capacidade}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.percentualCheio}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.qtdLocais}</td>
+                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.qtdMinLocais}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.codigoFrota}</td>
-                                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.prioridade}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.temRodizio ? 'SIM' : 'NÃO'}</td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                           <Toggle enabled={vehicle.ativo!} handleChangeToggle={() => handleChangeStatus(vehicle.ativo!, vehicle.id)} />
