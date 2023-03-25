@@ -7,8 +7,8 @@ export type Vehicle = {
   percentualCheio: number;
   qtdLocais: number;
   codigoFrota: number;
-  prioridade: number;
   pesoMinimo: number;
+  qtdMinLocais: number;
 };
 
 export type VehicleZone = {
@@ -24,8 +24,8 @@ export type SaveVehicleDTO = {
   percentualCheio: number;
   qtdLocais: number;
   codigoFrota: number;
-  prioridade: number;
   pesoMinimo: number;
+  qtdMinLocais: number;
 }
 
 export type AddZoneVehicleDTO = {

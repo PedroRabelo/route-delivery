@@ -34,4 +34,8 @@ export class CreateVeiculoDto {
   @IsNumber()
   @IsOptional()
   pesoMinimo: number;
+
+  @IsNumber()
+  @IsOptional()
+  qtdMinLocais: number;
 }

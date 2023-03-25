@@ -115,14 +115,24 @@ export class VeiculosService {
     updateVeiculoZonaDto: UpdateVeiculoZonaDto,
   ) {
     try {
-      const veiculoZona = await this.veiculoZonaRepository.findOne({
+      const veiculoZona1 = await this.veiculoZonaRepository.findOne({
         where: {
           veiculoId,
           zonaId
         }
       })
 
-      await this.veiculoZonaRepository.update(veiculoZona, updateVeiculoZonaDto);
+      const veiculoZona2 = await this.veiculoZonaRepository.findOne({
+        where: {
+          veiculoId,
+          prioridade: updateVeiculoZonaDto.prioridade
+        }
+      });
+
+      const prioridadeAntiga = veiculoZona1.prioridade;
+
+      await this.veiculoZonaRepository.update(veiculoZona1, updateVeiculoZonaDto);
+      await this.veiculoZonaRepository.update(veiculoZona2, { prioridade: prioridadeAntiga });
     } catch (error) {
       console.log(error);
       throw error;
@@ -157,6 +167,16 @@ export class VeiculosService {
       await this.veiculoZonaRepository.delete({
         veiculoId,
         zonaId
+      });
+
+      const zonas = await this.veiculoZonaRepository.find({
+        where: {
+          veiculoId
+        },
+      });
+
+      zonas.map(async (zona, index) => {
+        await this.veiculoZonaRepository.update(zona.id, { prioridade: zona.prioridade = index + 1 });
       });
     } catch (error) {
       console.log(error);

@@ -180,7 +180,7 @@ export default function Zones() {
           <h2 className="font-semibold pb-2">Zonas cadastradas</h2>
           <div>
             <div className="inline-block min-w-full align-middle">
-              <div className="relative overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <div className="relative overflow-y-auto max-h-[60vh] max-w-[45vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">
                     <tr>

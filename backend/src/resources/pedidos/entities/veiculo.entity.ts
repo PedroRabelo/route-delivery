@@ -38,4 +38,6 @@ export class Veiculo {
   @Column({ name: 'PESO_MINIMO' })
   pesoMinimo: number;
 
+  @Column({ name: 'MIN_LOCAL' })
+  qtdMinLocais: number;
 }
