@@ -455,7 +455,7 @@ export function Vehicles() {
               </div>
 
               <div className="inline-block min-w-full max-w-[40vh] align-middle">
-                <div className="relative overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div className="relative overflow-y-auto max-h-[40vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
@@ -485,7 +485,7 @@ export function Vehicles() {
             <div>
               <h2 className="font-semibold pb-2 mb-8">Zonas cadastradas</h2>
               <div className="inline-block min-w-full max-w-[40vh] align-middle">
-                <div className="relative overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div className="relative overflow-y-auto max-h-[40vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
