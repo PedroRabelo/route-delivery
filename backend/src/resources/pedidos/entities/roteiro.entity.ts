@@ -15,8 +15,14 @@ export class Roteiro {
   @Column({ name: 'entregas_por_veiculo' })
   entregasPorVeiculo: number;
 
-  @Column({ name: 'area_maxima' })
-  areaMaxima: number;
+  @Column({ name: 'area_1' })
+  area1: number;
+
+  @Column({ name: 'area_2' })
+  area2: number;
+
+  @Column({ name: 'distancia' })
+  distancia: number;
 
   @OneToMany(() => Pedido, (pedido) => pedido.roteiro)
   pedidos: Pedido[];

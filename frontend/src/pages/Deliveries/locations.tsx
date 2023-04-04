@@ -120,14 +120,17 @@ export function DeliveryLocations() {
         return;
       }
 
+      setIsLoading(true);
       const response = await api.post(`/pedidos/retorno/${id}`, params);
 
       const worksheet = utils.json_to_sheet(response.data);
       const workbook = utils.book_new();
       utils.book_append_sheet(workbook, worksheet, "Entregas");
       writeFile(workbook, `Entregas-${route?.data}.xlsx`);
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   }
 

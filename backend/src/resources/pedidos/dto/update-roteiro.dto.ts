@@ -3,9 +3,13 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 export class UpdateRoteiroDto {
   @IsNotEmpty()
   @IsNumber()
-  deliveries: number;
+  distance: number;
 
   @IsNotEmpty()
   @IsNumber()
-  area: number;
+  area1: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  area2: number;
 }

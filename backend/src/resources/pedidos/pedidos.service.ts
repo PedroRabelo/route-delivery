@@ -201,8 +201,9 @@ export class PedidosService {
     await this.roteiroRepository.save({
       id: id,
       status: 'PROCESSADO',
-      entregasPorVeiculo: dto.deliveries,
-      areaMaxima: dto.area,
+      distancia: dto.distance,
+      area1: dto.area1,
+      area2: dto.area2,
     });
 
     return await this.pedidoRepository.query(
@@ -265,8 +266,9 @@ export class PedidosService {
         id: roteiro.id,
         data: roteiro.dataEntrega,
         status: roteiro.status,
-        areaMaxima: roteiro.areaMaxima,
-        entregasPorVeiculo: roteiro.entregasPorVeiculo,
+        area1: roteiro.area1,
+        area2: roteiro.area2,
+        distance: roteiro.distancia,
       };
     } catch (error) {
       console.log(error);
