@@ -191,7 +191,7 @@ export class PedidosService {
       WHERE 
         PED.roteiroId=@0
       GROUP BY VEIC.ID, VEIC.ORD_CAR,VEIC.PLACA,VEIC.CAPACIDADE,VEIC.RODIZIO
-      ORDER BY percentual
+      ORDER BY VEIC.ORD_CAR
       `,
       [id],
     );
