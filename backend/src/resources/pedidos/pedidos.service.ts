@@ -10,6 +10,7 @@ import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { Pedido } from './entities/pedido.entity';
 import { Roteiro } from './entities/roteiro.entity';
+import { Veiculo } from './entities/veiculo.entity';
 
 @Injectable()
 export class PedidosService {
@@ -18,6 +19,8 @@ export class PedidosService {
     private pedidoRepository: Repository<Pedido>,
     @InjectRepository(Roteiro)
     private roteiroRepository: Repository<Roteiro>,
+    @InjectRepository(Veiculo)
+    private veiculoRepository: Repository<Veiculo>
   ) { }
 
   async create(createPedidoDto: CreatePedidoDto[]) {
@@ -174,24 +177,7 @@ export class PedidosService {
   async getVehiclesDelivery(id: number) {
     return await this.pedidoRepository.query(
       `
-      SELECT
-        VEIC.ID as id,
-        VEIC.ORD_CAR as ordem,
-        VEIC.PLACA as placa,
-        VEIC.CAPACIDADE as capacidade,
-        VEIC.RODIZIO as rodizio,
-        COUNT(DISTINCT(id_pedidos_locais)) as locais,
-        COUNT(*) as pedidos,
-        SUM(PED.BRUTO) as peso,
-        SUM(PED.TOTAL) as valor,
-        (SUM(PED.BRUTO) * 100) / VEIC.CAPACIDADE as percentual
-      FROM 
-        PEDIDOS PED
-        INNER JOIN VEICULOS VEIC ON VEIC.ID = PED.ID_VEICULO
-      WHERE 
-        PED.roteiroId=@0
-      GROUP BY VEIC.ID, VEIC.ORD_CAR,VEIC.PLACA,VEIC.CAPACIDADE,VEIC.RODIZIO
-      ORDER BY VEIC.ORD_CAR
+        EXEC SP_BuscaEntregasPorRoteiro @0
       `,
       [id],
     );
@@ -318,23 +304,33 @@ export class PedidosService {
       }
     });
 
-    const novoVeiculoPedidos1: Pedido[] = pedidosVeiculo1.map((vei1) => {
-      return {
-        ...vei1,
-        veiculoId: dto.veiculo2Id,
-        placa: dto.placa2,
-      }
-    });
+    if (pedidosVeiculo1 !== null && pedidosVeiculo1.length > 0) {
+      const novoVeiculoPedidos1: Pedido[] = pedidosVeiculo1.map((vei1) => {
+        return {
+          ...vei1,
+          veiculoId: dto.veiculo2Id,
+          placa: dto.placa2,
+        }
+      });
 
-    const novoVeiculoPedidos2: Pedido[] = pedidosVeiculo2.map((vei2) => {
-      return {
-        ...vei2,
-        veiculoId: dto.veiculo1Id,
-        placa: dto.placa1,
-      }
-    });
+      await this.pedidoRepository.save(novoVeiculoPedidos1);
+    }
 
-    await this.pedidoRepository.save(novoVeiculoPedidos1);
-    await this.pedidoRepository.save(novoVeiculoPedidos2);
+    if (pedidosVeiculo2 !== null && pedidosVeiculo2.length > 0) {
+
+
+      const novoVeiculoPedidos2: Pedido[] = pedidosVeiculo2.map((vei2) => {
+        return {
+          ...vei2,
+          veiculoId: dto.veiculo1Id,
+          placa: dto.placa1,
+        }
+      });
+
+      await this.pedidoRepository.save(novoVeiculoPedidos2);
+    }
+
+    await this.veiculoRepository.update(dto.veiculo1Id, { ordem: dto.ordem2 })
+    await this.veiculoRepository.update(dto.veiculo2Id, { ordem: dto.ordem1 })
   }
 }

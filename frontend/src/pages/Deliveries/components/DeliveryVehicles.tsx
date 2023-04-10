@@ -62,8 +62,10 @@ export default function DeliveryVehicles({ trucks, handleFilterDeliveryPoints, h
       roteiroId: id,
       veiculo1Id: selectedVehicle[0].id,
       placa1: selectedVehicle[0].placa,
+      ordem1: selectedVehicle[0].ordem,
       veiculo2Id: selectedVehicle[1].id,
-      placa2: selectedVehicle[1].placa
+      placa2: selectedVehicle[1].placa,
+      ordem2: selectedVehicle[1].ordem,
     }
 
     await api.post(`/pedidos/alterar-veiculos`, payload);

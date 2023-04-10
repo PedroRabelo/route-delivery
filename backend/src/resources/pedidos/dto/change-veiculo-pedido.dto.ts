@@ -15,9 +15,17 @@ export class ChangeVeiculoPedido {
 
   @IsNumber()
   @IsNotEmpty()
+  ordem1: number;
+
+  @IsNumber()
+  @IsNotEmpty()
   veiculo2Id: number;
 
   @IsString()
   @IsNotEmpty()
   placa2: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  ordem2: number;
 }

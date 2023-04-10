@@ -40,4 +40,7 @@ export class Veiculo {
 
   @Column({ name: 'MIN_LOCAL' })
   qtdMinLocais: number;
+
+  @Column({ name: 'ORD_CAR' })
+  ordem: number;
 }
