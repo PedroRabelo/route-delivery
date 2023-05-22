@@ -164,7 +164,7 @@ export default function Deliveries() {
                             <div className="flex justify-end gap-4">
                               {delivery.status !== 'AGUARDANDO_LAT_LONG' &&
                                 <DataTableActions
-                                  to={`/delivery-locations/${delivery.id}`}
+                                  to={`/routes-delivery/${delivery.id}`}
                                   Icon={MapPinIcon}
                                   color="primary"
                                   title="Distribuir pedidos"

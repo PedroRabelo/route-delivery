@@ -7,6 +7,7 @@ import { CreateDelivery } from './pages/Deliveries/create'
 import { DeliveryLocations } from './pages/Deliveries/locations'
 import { Vehicles } from './pages/Vehicles'
 import Zones from './pages/Zones'
+import { RoutesDelivery } from './pages/Deliveries/routes-delivery'
 
 
 export function Router() {
@@ -16,6 +17,7 @@ export function Router() {
         <Route path="/" element={<Deliveries />} />
         <Route path="/delivery-create/:id" element={<CreateDelivery />} />
         <Route path="/delivery-locations/:id" element={<DeliveryLocations />} />
+        <Route path="/routes-delivery/:id" element={<RoutesDelivery />} />
 
         <Route path="/zonas" element={<Zones />} />
         <Route path="/veiculos" element={<Vehicles />} />
