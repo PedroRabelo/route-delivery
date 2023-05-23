@@ -1,18 +1,19 @@
-import { useEffect, useState } from "react";
-import { Button } from "../../components/Button";
-import { FormInput } from "../../components/Form";
-import * as zod from 'zod';
-import { formatDateOnly } from "../../services/utils/formatDateOnly";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { MapIcon, MapPinIcon, QueueListIcon, TableCellsIcon, TruckIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DeliveryPoints, DeliveryRoute, DeliveryVehicle } from "../../services/types/Delivery";
-import { api } from "../../lib/axios";
+import classNames from "classnames";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { utils, writeFile } from "xlsx";
-import { MapIcon, MapPinIcon, TableCellsIcon, TruckIcon } from "@heroicons/react/24/outline";
-import classNames from "classnames";
+import * as zod from 'zod';
+import { Button } from "../../components/Button";
+import { FormInput } from "../../components/Form";
+import { api } from "../../lib/axios";
+import { DeliveryPoints, DeliveryRoute, DeliveryVehicle, VehicleDeliveries } from "../../services/types/Delivery";
+import { formatDateOnly } from "../../services/utils/formatDateOnly";
 import { DeliveriesMap } from "./components/DeliveriesMap";
-import { DeliveriesRoutes } from "./components/DeliveriesRoutes";
+import { DeliveriesVehicle } from "./components/DeliveriesVehicles";
+import { DeliveriesWithoutVehicle } from "./components/DeliveriesWithoutVehicle";
 
 const requiredText = "Campo obrigatório";
 
@@ -27,8 +28,9 @@ type NewDeliveryFormData = zod.infer<typeof deliveryFormValidationSchema>
 const tabs = [
   { id: 1, name: 'Mapa', icon: MapIcon },
   { id: 2, name: 'Rotas', icon: MapPinIcon },
-  { id: 3, name: 'Simulações', icon: TableCellsIcon },
-  { id: 4, name: 'Veículos', icon: TruckIcon },
+  { id: 3, name: 'Pedidos sem veículo', icon: QueueListIcon },
+  { id: 4, name: 'Simulações', icon: TableCellsIcon },
+  { id: 5, name: 'Veículos', icon: TruckIcon },
 ]
 
 export function RoutesDelivery() {
@@ -37,7 +39,7 @@ export function RoutesDelivery() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [tabSelected, setTabSelected] = useState(1);
-
+  const [vehicleDeliveries, setVehicleDeliveries] = useState<VehicleDeliveries>();
   const [deliveryPoints, setDeliveryPoints] = useState<DeliveryPoints[]>();
   const [deliveryVehicles, setDeliveryVehicles] = useState<DeliveryVehicle[]>();
   const [deliveryWithoutVehicle, setDeliveryWithoutVehicle] = useState<DeliveryPoints[]>();
@@ -127,6 +129,19 @@ export function RoutesDelivery() {
     } catch (error) {
       console.log(error);
       setIsLoading(false);
+    }
+  }
+
+  async function openDeliveriesByTruck(plate: string) {
+    async function filterVehicle(licensePlate: string) {
+      return deliveryVehicles?.find(vehicle => vehicle.placa === licensePlate);
+    }
+
+    const vehicle = await filterVehicle(plate);
+
+    if (vehicle) {
+      setVehicleDeliveries({ vehicle, orders: deliveryPoints });
+      setLicensePlate(plate);
     }
   }
 
@@ -263,9 +278,21 @@ export function RoutesDelivery() {
           </div>
         </div>
       </div>
-      <div className="flex">
-        {tabSelected == 1 && <DeliveriesMap deliveryPoints={deliveriesByTruck} />}
-        {tabSelected == 2 && <DeliveriesRoutes />}
+      <div className="flex-1">
+        {tabSelected == 1 &&
+          <DeliveriesMap deliveryPoints={deliveriesByTruck} />
+        }
+        {tabSelected == 2 &&
+          <DeliveriesVehicle trucks={deliveryVehicles}
+            handleFilterDeliveryPoints={(plate) => openDeliveriesByTruck(plate)}
+            handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
+          />
+        }
+        {tabSelected == 3 &&
+          <DeliveriesWithoutVehicle
+            deliveries={deliveryWithoutVehicle}
+          />
+        }
 
       </div>
     </div>

@@ -12,10 +12,10 @@ import { api } from '../../lib/axios';
 import { DeliveryPoints, DeliveryRoute, DeliveryVehicle, VehicleDeliveries } from '../../services/types/Delivery';
 import { formatDateOnly } from '../../services/utils/formatDateOnly';
 import { DeliveriesInfo } from './components/DeliveriesInfo';
-import DeliveriesWithoutVehicle from './components/DeliveriesWithoutVehicle';
+import { DeliveriesVehicle } from './components/DeliveriesVehicles';
 import DeliveryTab from './components/DeliveryTab';
-import DeliveryVehicles from './components/DeliveryVehicles';
 import Vehicles from './components/Vehicles';
+import { DeliveriesWithoutVehicle } from './components/DeliveriesWithoutVehicle';
 
 const requiredText = "Campo obrigatório";
 
@@ -312,12 +312,12 @@ export function DeliveryLocations() {
 
             {
               tabBarSelected === 'Entregues' && (
-                <DeliveryVehicles
+                <DeliveriesVehicle
                   trucks={deliveryVehicles}
                   handleFilterDeliveryPoints={(plate) => openDeliveriesByTruck(plate)}
                   handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
                 />
-              ) 
+              )
             }
 
             {
