@@ -24,7 +24,6 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
           name="tabs"
           className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
           defaultValue={tabSelected}
-
         >
           <option>Entregues</option>
           <option>Não Entregues</option>
@@ -39,13 +38,13 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
             }}
             className={classNames(
               tabSelected === 'Entregues' ? 'bg-gray-200 text-gray-800' : 'text-gray-600 hover:text-gray-800',
-              'px-3 py-2 font-medium text-sm rounded-md cursor-pointer'
+              'flex flex-row px-1 py-2 font-medium text-sm rounded-md cursor-pointer'
             )}
             aria-current={tabSelected ? 'page' : undefined}
           >
             Entregues
             <span
-              className="text-green-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-sm font-medium md:inline-block"
+              className="text-green-600 hidden ml-1 py-0.5 px-1.5 rounded-full text-sm font-medium md:inline-block"
             >
               {deliveries?.withTruck ?
                 deliveries.withTruck
@@ -59,14 +58,14 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
             }}
             className={classNames(
               tabSelected === 'Não Entregues' ? 'bg-gray-200 text-gray-800' : 'text-gray-600 hover:text-gray-800',
-              'px-3 py-2 font-medium text-sm rounded-md cursor-pointer'
+              'flex flex-row px-1 py-2 font-medium text-sm rounded-md cursor-pointer'
             )}
             aria-current={tabSelected ? 'page' : undefined}
           >
             Não Entregues
 
             <span
-              className="text-red-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-sm font-medium md:inline-block"
+              className="text-red-600 hidden ml-1 py-0.5 px-1.5 rounded-full text-sm font-medium md:inline-block"
             >
               {deliveries?.noTruck ?
                 deliveries.noTruck

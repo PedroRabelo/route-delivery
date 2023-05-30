@@ -29,7 +29,7 @@ const tabs = [
   { id: 1, name: 'Mapa', icon: MapIcon },
   { id: 2, name: 'Rotas', icon: MapPinIcon },
   { id: 3, name: 'Pedidos sem veículo', icon: QueueListIcon },
-  { id: 4, name: 'Simulações', icon: TableCellsIcon },
+  // { id: 4, name: 'Simulações', icon: TableCellsIcon },
   { id: 5, name: 'Veículos', icon: TruckIcon },
 ]
 
@@ -280,10 +280,15 @@ export function RoutesDelivery() {
       </div>
       <div className="flex-1">
         {tabSelected == 1 &&
-          <DeliveriesMap deliveryPoints={deliveriesByTruck} />
+          <DeliveriesMap
+            deliveryPoints={deliveriesByTruck}
+            deliveryVehicles={deliveryVehicles}
+            deliveryWithoutVehicle={deliveryWithoutVehicle}
+          />
         }
         {tabSelected == 2 &&
-          <DeliveriesVehicle trucks={deliveryVehicles}
+          <DeliveriesVehicle
+            trucks={deliveryVehicles}
             handleFilterDeliveryPoints={(plate) => openDeliveriesByTruck(plate)}
             handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
           />
