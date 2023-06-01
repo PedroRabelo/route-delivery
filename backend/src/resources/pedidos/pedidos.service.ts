@@ -11,6 +11,7 @@ import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { Pedido } from './entities/pedido.entity';
 import { Roteiro } from './entities/roteiro.entity';
 import { Veiculo } from './entities/veiculo.entity';
+import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
 
 @Injectable()
 export class PedidosService {
@@ -332,5 +333,28 @@ export class PedidosService {
 
     await this.veiculoRepository.update(dto.veiculo1Id, { ordem: dto.ordem2 })
     await this.veiculoRepository.update(dto.veiculo2Id, { ordem: dto.ordem1 })
+  }
+
+  async removeVehicleRoute(dto: DeleteRouteVehicleDTO) {
+    try {
+      const deliveries = await this.pedidoRepository.find({
+        where: {
+          veiculoId: dto.veiculoId,
+          roteiro: {
+            id: dto.roteiroId
+          }
+        }
+      });
+
+      if (deliveries.length === 0) {
+        throw new Error('Nenhum pedido encontrado com o veículo informado.');
+      }
+
+      deliveries.map(async (d) => {
+        await this.pedidoRepository.update(d.id, { veiculoId: null, placa: null });
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

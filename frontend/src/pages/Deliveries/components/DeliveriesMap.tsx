@@ -50,7 +50,14 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
   }
 
   function filterPoints(points: DeliveryPoints[]) {
-    // TODO Continuar aqui
+    if (points.length === 0) {
+      setDeliveriesFiltered(deliveryPoints)
+    } else {
+      const orders = points.flatMap(m => m.placa);
+      const filteredPoints = deliveryPoints?.filter(p => orders.includes(p.placa))
+
+      setDeliveriesFiltered(filteredPoints)
+    }
   }
 
   if (!isLoaded) return <div>Loading...</div>;

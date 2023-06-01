@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseInterceptors,
@@ -15,6 +16,7 @@ import { getLatLongFromAddress } from 'src/common/utils/getLatLongFromAddress';
 import { readFile, utils } from 'xlsx';
 import { ChangeVeiculoPedido } from './dto/change-veiculo-pedido.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
+import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { PedidosService } from './pedidos.service';
@@ -139,5 +141,10 @@ export class PedidosController {
   @Post('alterar-veiculos')
   async changeVehiclesDelivery(@Body() dto: ChangeVeiculoPedido) {
     return this.pedidosService.changeVehicles(dto);
+  }
+
+  @Put('desfazer-rota')
+  removeVehicleRoute(@Body() dto: DeleteRouteVehicleDTO) {
+    return this.pedidosService.removeVehicleRoute(dto);
   }
 }

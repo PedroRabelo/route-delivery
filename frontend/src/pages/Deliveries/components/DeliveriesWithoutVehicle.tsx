@@ -14,40 +14,25 @@ export function DeliveriesWithoutVehicle({ deliveries }: Props) {
   return (
     <div>
       <div>
-        <dl className="mt-0 grid grid-cols-1 gap-6 sm:grid-cols-6">
+        <dl className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
             <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
-              29 Veículos utilizados
+              {deliveries?.length} Pedidos
             </dd>
           </div>
           <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
             <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
-              71.999Kg Capacidade
+              {deliveries?.length && formatNumber(getSumByKey(deliveries, 'peso'))}Kg de carga total
             </dd>
           </div>
           <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
             <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
-              124 Locais
-            </dd>
-          </div>
-          <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
-            <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
-              1245 Pedidos
-            </dd>
-          </div>
-          <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
-            <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
-              50.123Kg Carga total
-            </dd>
-          </div>
-          <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
-            <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
-              R$908.393 Valor Total
+              {deliveries?.length && formatCurrency(getSumByKey(deliveries, 'valor'))} Valor total
             </dd>
           </div>
         </dl>
       </div>
-      <div className="mt-8 flex flex-col min-w-full">
+      <div className="mt-4 flex flex-col min-w-full">
         <div className="">
           <div className="inline-block min-w-full align-middle">
             <div className="overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
@@ -94,17 +79,6 @@ export function DeliveriesWithoutVehicle({ deliveries }: Props) {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot>
-                  {deliveries?.length && <tr className="text-gray-900">
-                    <th scope="row" className="py-3 font-semibold text-center">Total</th>
-                    <td className="py-3 px-6 text-center">
-                      {formatNumber(getSumByKey(deliveries, 'peso'))}
-                    </td>
-                    <td className="py-3 px-6 text-center">
-                      {formatCurrency(getSumByKey(deliveries, 'valor'))}
-                    </td>
-                  </tr>}
-                </tfoot>
               </table>
             </div>
           </div>

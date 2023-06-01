@@ -32,7 +32,7 @@ export function FilterMapDeliveries({
               type="button"
               onClick={() => handleFilterByVehicles(selectedVehicle)}
             />
-            <div className="inline-block min-w-full align-middle">
+            <div className="mt-2 inline-block min-w-full align-middle">
               <div className="relative overflow-y-auto max-h-[52vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-300">
                   <thead className="bg-gray-50">

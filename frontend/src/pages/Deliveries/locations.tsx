@@ -314,7 +314,6 @@ export function DeliveryLocations() {
               tabBarSelected === 'Entregues' && (
                 <DeliveriesVehicle
                   trucks={deliveryVehicles}
-                  handleFilterDeliveryPoints={(plate) => openDeliveriesByTruck(plate)}
                   handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
                 />
               )

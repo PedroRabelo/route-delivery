@@ -45,7 +45,6 @@ export function RoutesDelivery() {
   const [deliveryWithoutVehicle, setDeliveryWithoutVehicle] = useState<DeliveryPoints[]>();
   const [route, setRoute] = useState<DeliveryRoute>();
   const [licensePlate, setLicensePlate] = useState('');
-  const [deliveriesByTruck, setDeliveriesByTruck] = useState<DeliveryPoints[]>();
 
   const newDeliveryForm = useForm<NewDeliveryFormData>({
     resolver: zodResolver(deliveryFormValidationSchema),
@@ -96,7 +95,6 @@ export function RoutesDelivery() {
     const response = await api.get(`/pedidos/dia/${id}`);
 
     setDeliveryPoints(response.data);
-    setDeliveriesByTruck(response.data);
   }
 
   async function fetchDeliveriesVehicles() {
@@ -109,6 +107,12 @@ export function RoutesDelivery() {
     const response = await api.get(`/pedidos/nao-entregues/${id}`);
 
     setDeliveryWithoutVehicle(response.data);
+  }
+
+  async function fetchUpdateDeliveries() {
+    fetchDeliveriesPoints();
+    fetchDeliveriesVehicles();
+    fetchDeliveriesWithoutVehicle();
   }
 
   async function exportDeliveries(params: NewDeliveryFormData) {
@@ -129,19 +133,6 @@ export function RoutesDelivery() {
     } catch (error) {
       console.log(error);
       setIsLoading(false);
-    }
-  }
-
-  async function openDeliveriesByTruck(plate: string) {
-    async function filterVehicle(licensePlate: string) {
-      return deliveryVehicles?.find(vehicle => vehicle.placa === licensePlate);
-    }
-
-    const vehicle = await filterVehicle(plate);
-
-    if (vehicle) {
-      setVehicleDeliveries({ vehicle, orders: deliveryPoints });
-      setLicensePlate(plate);
     }
   }
 
@@ -281,7 +272,7 @@ export function RoutesDelivery() {
       <div className="flex-1">
         {tabSelected == 1 &&
           <DeliveriesMap
-            deliveryPoints={deliveriesByTruck}
+            deliveryPoints={deliveryPoints}
             deliveryVehicles={deliveryVehicles}
             deliveryWithoutVehicle={deliveryWithoutVehicle}
           />
@@ -289,8 +280,8 @@ export function RoutesDelivery() {
         {tabSelected == 2 &&
           <DeliveriesVehicle
             trucks={deliveryVehicles}
-            handleFilterDeliveryPoints={(plate) => openDeliveriesByTruck(plate)}
-            handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
+            handleFetchUpdateDeliveries={() => fetchUpdateDeliveries()}
+            deliveryPoints={deliveryPoints}
           />
         }
         {tabSelected == 3 &&
