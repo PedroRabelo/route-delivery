@@ -1,17 +1,20 @@
-import { GoogleMap, InfoWindow, Marker, MarkerClusterer } from "@react-google-maps/api";
+import { DrawingManagerF, GoogleMap, InfoWindow, Marker, MarkerClusterer, Polygon } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DeliveryPoints } from '../../services/types/Delivery';
 import { formatCurrency, formatNumber } from "../../services/utils/formatNumber";
+import { Bound } from "./MapDrawing";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MapOptions = google.maps.MapOptions;
 
 interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
+  drawingEnable: boolean
 }
 
-export function MapLocations({ deliveryPoints }: MapProps) {
+export function MapLocations({ deliveryPoints, drawingEnable }: MapProps) {
   const mapRef = useRef<GoogleMap>();
+  const drawingManagerRef = useRef<google.maps.drawing.DrawingManager>();
   const center = useMemo<LatLngLiteral>(
     () => ({ lat: -23.5298971, lng: -46.749152 }),
     []
@@ -38,6 +41,25 @@ export function MapLocations({ deliveryPoints }: MapProps) {
 
     setRenderInfowWindow(true);
   }
+
+  const onPolygonComplete = (polygon: google.maps.Polygon) => {
+    drawingManagerRef?.current?.setDrawingMode(null);
+    var polygonBounds = polygon.getPath();
+    var bounds: Bound[] = [];
+    for (var i = 0; i < polygonBounds.getLength(); i++) {
+      var point: Bound = {
+        lat: polygonBounds.getAt(i).lat(),
+        lng: polygonBounds.getAt(i).lng(),
+      };
+      bounds.push(point);
+    }
+
+    //handleSetBounds(bounds);
+  };
+
+  const onLoadDrawing = (drawingManager: any) => {
+    drawingManagerRef.current = drawingManager;
+  };
 
   return (
     <GoogleMap
@@ -99,6 +121,21 @@ export function MapLocations({ deliveryPoints }: MapProps) {
         </InfoWindow>
       }
 
+      {drawingEnable &&
+        <>
+          <DrawingManagerF
+            onPolygonComplete={onPolygonComplete}
+            onLoad={onLoadDrawing}
+            options={{
+              drawingControl: true,
+              drawingControlOptions: {
+                position: google.maps.ControlPosition.TOP_CENTER,
+                drawingModes: [google.maps.drawing.OverlayType.POLYGON],
+              },
+            }}
+          />
+        </>
+      }
     </GoogleMap>
   )
 }

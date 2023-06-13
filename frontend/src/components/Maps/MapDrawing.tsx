@@ -1,6 +1,6 @@
 /* global google */
-import { DrawingManagerF, DrawingManagerProps, GoogleMap, InfoWindow, Marker, Polygon } from "@react-google-maps/api";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { DrawingManagerF, GoogleMap, Polygon } from "@react-google-maps/api";
+import { useCallback, useMemo, useRef } from "react";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MapOptions = google.maps.MapOptions;

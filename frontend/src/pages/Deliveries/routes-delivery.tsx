@@ -14,6 +14,7 @@ import { formatDateOnly } from "../../services/utils/formatDateOnly";
 import { DeliveriesMap } from "./components/DeliveriesMap";
 import { DeliveriesVehicle } from "./components/DeliveriesVehicles";
 import { DeliveriesWithoutVehicle } from "./components/DeliveriesWithoutVehicle";
+import { VehiclesList } from "./components/VehiclesList";
 
 const requiredText = "Campo obrigatório";
 
@@ -287,6 +288,12 @@ export function RoutesDelivery() {
         {tabSelected == 3 &&
           <DeliveriesWithoutVehicle
             deliveries={deliveryWithoutVehicle}
+          />
+        }
+
+        {tabSelected == 5 &&
+          <VehiclesList
+            deliveries={deliveryPoints}
           />
         }
 

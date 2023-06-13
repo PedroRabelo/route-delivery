@@ -12,9 +12,18 @@ interface MapProps {
   deliveryWithoutVehicle: DeliveryPoints[] | undefined
 }
 
+const libraries: (
+  | "places"
+  | "drawing"
+  | "geometry"
+  | "localContext"
+  | "visualization"
+)[] = ["drawing"];
+
 export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithoutVehicle }: MapProps) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    libraries: libraries,
   });
 
   const [tabBarSelected, setTabBarSelected] = useState('Entregues');
@@ -70,9 +79,11 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
             handleChangeTabBar={(tab) => setTabBarSelected(tab)}
             deliveries={{ withTruck: totalEntregues, noTruck: totalNaoEntregues }}
           />
-          <div className="flex flex-col gap-2">
-
-          </div>
+          {/* <Button
+            title="Polígono"
+            color="primary"
+            type="button"
+          /> */}
         </div>
         <FilterMapDeliveries
           tabBarSelected={tabBarSelected}
@@ -83,7 +94,10 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
         />
       </div>
       <div className='flex-1 grow h-[66vh]'>
-        <MapLocations deliveryPoints={deliveriesFiltered} />
+        <MapLocations
+          deliveryPoints={deliveriesFiltered}
+          drawingEnable={false}
+        />
       </div>
     </div>
   )

@@ -35,7 +35,7 @@ export function DeliveriesWithoutVehicle({ deliveries }: Props) {
       <div className="mt-4 flex flex-col min-w-full">
         <div className="">
           <div className="inline-block min-w-full align-middle">
-            <div className="overflow-y-auto max-h-[60vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+            <div className="overflow-y-auto max-h-[56vh] shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
