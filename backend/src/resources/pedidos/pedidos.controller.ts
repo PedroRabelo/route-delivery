@@ -20,6 +20,7 @@ import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { PedidosService } from './pedidos.service';
+import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
 
 @Controller('pedidos')
 export class PedidosController {
@@ -146,5 +147,10 @@ export class PedidosController {
   @Put('desfazer-rota')
   removeVehicleRoute(@Body() dto: DeleteRouteVehicleDTO) {
     return this.pedidosService.removeVehicleRoute(dto);
+  }
+
+  @Post('pedido-poligono')
+  createPedidoPoligono(@Body() dto: CreatePedidoPoligonoDto) {
+    return this.pedidosService.createPedidoPoligono(dto);
   }
 }

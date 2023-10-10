@@ -9,10 +9,11 @@ type MapOptions = google.maps.MapOptions;
 
 interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
-  drawingEnable: boolean
+  drawingEnable?: boolean;
+  handleSetBounds: (bounds: Bound[]) => void;
 }
 
-export function MapLocations({ deliveryPoints, drawingEnable }: MapProps) {
+export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds }: MapProps) {
   const mapRef = useRef<GoogleMap>();
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager>();
   const center = useMemo<LatLngLiteral>(
@@ -54,7 +55,7 @@ export function MapLocations({ deliveryPoints, drawingEnable }: MapProps) {
       bounds.push(point);
     }
 
-    //handleSetBounds(bounds);
+    handleSetBounds(bounds);
   };
 
   const onLoadDrawing = (drawingManager: any) => {

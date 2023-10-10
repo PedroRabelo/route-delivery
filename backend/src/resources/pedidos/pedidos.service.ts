@@ -12,6 +12,8 @@ import { Pedido } from './entities/pedido.entity';
 import { Roteiro } from './entities/roteiro.entity';
 import { Veiculo } from './entities/veiculo.entity';
 import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
+import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
+import { PedidoPoligono } from './entities/pedido-poligono.entity';
 
 @Injectable()
 export class PedidosService {
@@ -21,7 +23,9 @@ export class PedidosService {
     @InjectRepository(Roteiro)
     private roteiroRepository: Repository<Roteiro>,
     @InjectRepository(Veiculo)
-    private veiculoRepository: Repository<Veiculo>
+    private veiculoRepository: Repository<Veiculo>,
+    @InjectRepository(PedidoPoligono)
+    private pedidoPoligonoRepository: Repository<PedidoPoligono>
   ) { }
 
   async create(createPedidoDto: CreatePedidoDto[]) {
@@ -355,6 +359,22 @@ export class PedidosService {
       });
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async createPedidoPoligono(createPedidoPoligonoDto: CreatePedidoPoligonoDto) {
+    try {
+      const pedidoPoligono = await this.pedidoPoligonoRepository.save(createPedidoPoligonoDto);
+
+      // TODO - Chamar procedure que busca os pedidos na área do polígono
+
+      return {
+        id: pedidoPoligono.id,
+        roteiro: pedidoPoligono.roteiroId
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 }

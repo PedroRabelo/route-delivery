@@ -44,6 +44,16 @@ export type VehicleDeliveries = {
   orders?: DeliveryPoints[];
 };
 
+export type CreateDeliveryPolygonDTO = {
+  roteiroId: number;
+  coordenadas: CreateDeliveryPolygonDTOCoordsDTO[];
+}
+
+export type CreateDeliveryPolygonDTOCoordsDTO = {
+  latitude: number;
+  longitude: number;
+}
+
 type DiaSemana = {
   id: string;
   name: string;

@@ -314,7 +314,8 @@ export function DeliveryLocations() {
               tabBarSelected === 'Entregues' && (
                 <DeliveriesVehicle
                   trucks={deliveryVehicles}
-                  handleFetchDeliveryVehicles={() => fetchDeliveriesVehicles()}
+                  handleFetchUpdateDeliveries={() => null}
+                  deliveryPoints={deliveryPoints}
                 />
               )
             }

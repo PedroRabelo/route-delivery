@@ -1,10 +1,11 @@
 import { useLoadScript } from "@react-google-maps/api";
-import { MapLocations } from "../../../components/Maps";
+import { Bound, MapLocations } from "../../../components/Maps";
 import { DeliveryPoints, DeliveryVehicle } from "../../../services/types/Delivery";
 import DeliveryTab from "./DeliveryTab";
 import { useEffect, useState } from "react";
 import { FilterMapDeliveries } from "./FilterMapDeliveries";
 import { Button } from "../../../components/Button";
+import { CreateRoute } from "./CreateRoute";
 
 interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
@@ -28,6 +29,8 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
 
   const [tabBarSelected, setTabBarSelected] = useState('Entregues');
   const [deliveriesFiltered, setDeliveriesFiltered] = useState(deliveryPoints);
+  const [drawingEnable, setDrawingEnable] = useState(false);
+  const [bounds, setBounds] = useState<Bound[]>([]);
 
   let totalEntregues = 0;
   let totalNaoEntregues = 0;
@@ -79,24 +82,33 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
             handleChangeTabBar={(tab) => setTabBarSelected(tab)}
             deliveries={{ withTruck: totalEntregues, noTruck: totalNaoEntregues }}
           />
-          {/* <Button
+          <Button
             title="Polígono"
             color="primary"
             type="button"
-          /> */}
+            disabled={deliveryPoints === undefined || deliveryPoints.length === 0}
+            onClick={() => setDrawingEnable(!drawingEnable)}
+          />
         </div>
-        <FilterMapDeliveries
-          tabBarSelected={tabBarSelected}
-          deliveryVehicles={deliveryVehicles}
-          deliveryWithoutVehicles={deliveryWithoutVehicle}
-          handleFilterByVehicles={(vehicles) => filterPointsByVehicle(vehicles)}
-          handleFilterPoints={(points) => filterPoints(points)}
-        />
+        {bounds.length > 0 ?
+          <CreateRoute
+            bounds={bounds}
+            deliveryVehicles={deliveryVehicles}
+          /> :
+          <FilterMapDeliveries
+            tabBarSelected={tabBarSelected}
+            deliveryVehicles={deliveryVehicles}
+            deliveryWithoutVehicles={deliveryWithoutVehicle}
+            handleFilterByVehicles={(vehicles) => filterPointsByVehicle(vehicles)}
+            handleFilterPoints={(points) => filterPoints(points)}
+          />
+        }
       </div>
       <div className='flex-1 grow h-[66vh]'>
         <MapLocations
           deliveryPoints={deliveriesFiltered}
-          drawingEnable={false}
+          drawingEnable={drawingEnable}
+          handleSetBounds={(bounds) => setBounds(bounds)}
         />
       </div>
     </div>
