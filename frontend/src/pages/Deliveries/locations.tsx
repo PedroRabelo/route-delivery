@@ -179,7 +179,7 @@ export function DeliveryLocations() {
     <div className="flex gap-2">
       <div className="container">
         <div className='flex-1 grow h-[88vh]'>
-          <MapLocations deliveryPoints={deliveriesByTruck} />
+          <MapLocations deliveryPoints={deliveriesByTruck} handleSetBounds={() => null} />
         </div>
       </div>
       <div className="container flex-col">
