@@ -38,6 +38,7 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
       setIsLoading(true);
       const response = await api.post('pedidos/pedido-poligono', body);
 
+      alert('Polígonos adicionado com sucesso');
       //Recebe os pedidos para mostrar na tela
 
       setIsLoading(false)
@@ -59,13 +60,13 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
           loading={isLoading}
           onClick={() => fetchDeliveriesByPolygon()}
         />
-        <Button
+        {/* <Button
           title="Salvar"
           color="primary"
           type="submit"
           disabled={isLoading}
           loading={isLoading}
-        />
+        /> */}
       </div>
       {deliveryVehicles && deliveryVehicles.length > 0 &&
         <SelectMenu
