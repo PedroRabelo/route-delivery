@@ -54,6 +54,28 @@ export type CreateDeliveryPolygonDTOCoordsDTO = {
   longitude: number;
 }
 
+export type PolygonDeliveriesSummary = {
+  id: number;
+  locais: number;
+  notas: number;
+  pesoTotal: number;
+  valorTotal: number;
+  locaisRodizio: number;
+  notasRodizio: number;
+  pesoRodizio: number;
+  valorRodizio: number;
+  locaisForaRodizio: number;
+  notasForaRodizio: number;
+  pesoForaRodizio: number;
+  valorForaRodizio: number;
+}
+
+export type UpdatePedidoVeiculoPoligonoDto = {
+  pedidos: number[];
+  veiculoId: number;
+  placa: string;
+}
+
 type DiaSemana = {
   id: string;
   name: string;

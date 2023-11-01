@@ -10,7 +10,8 @@ import { CreateRoute } from "./CreateRoute";
 interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
   deliveryVehicles: DeliveryVehicle[] | undefined;
-  deliveryWithoutVehicle: DeliveryPoints[] | undefined
+  deliveryWithoutVehicle: DeliveryPoints[] | undefined;
+  areaRodizio: Bound[];
 }
 
 const libraries: (
@@ -21,7 +22,7 @@ const libraries: (
   | "visualization"
 )[] = ["drawing"];
 
-export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithoutVehicle }: MapProps) {
+export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithoutVehicle, areaRodizio }: MapProps) {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
     libraries: libraries,
@@ -72,6 +73,11 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
     }
   }
 
+  function cleanPolygon() {
+    setBounds([]);
+    window.location.reload();
+  }
+
   if (!isLoaded) return <div>Loading...</div>;
 
   return (
@@ -82,13 +88,22 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
             handleChangeTabBar={(tab) => setTabBarSelected(tab)}
             deliveries={{ withTruck: totalEntregues, noTruck: totalNaoEntregues }}
           />
-          <Button
-            title="Polígono"
-            color="primary"
-            type="button"
-            disabled={deliveryPoints === undefined || deliveryPoints.length === 0}
-            onClick={() => setDrawingEnable(!drawingEnable)}
-          />
+          {bounds.length === 0 &&
+            <Button
+              title="Polígono"
+              color="primary"
+              type="button"
+              onClick={() => setDrawingEnable(true)}
+            />
+          }
+          {bounds.length > 0 &&
+            <Button
+              title="Limpar Polígono"
+              color="primary"
+              type="button"
+              onClick={() => cleanPolygon()}
+            />
+          }
         </div>
         {bounds.length > 0 ?
           <CreateRoute
@@ -109,6 +124,7 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
           deliveryPoints={deliveriesFiltered}
           drawingEnable={drawingEnable}
           handleSetBounds={(bounds) => setBounds(bounds)}
+          polygonPath={areaRodizio}
         />
       </div>
     </div>

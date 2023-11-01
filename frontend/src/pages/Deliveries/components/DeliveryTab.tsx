@@ -25,8 +25,8 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
           className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
           defaultValue={tabSelected}
         >
-          <option>Entregues</option>
-          <option>Não Entregues</option>
+          <option>Com Veículo</option>
+          <option>Sem Veículo</option>
         </select>
       </div>
       <div className="hidden sm:block">
@@ -42,7 +42,7 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
             )}
             aria-current={tabSelected ? 'page' : undefined}
           >
-            Entregues
+            Com Veículo
             <span
               className="text-green-600 hidden ml-1 py-0.5 px-1.5 rounded-full text-sm font-medium md:inline-block"
             >
@@ -62,7 +62,7 @@ export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
             )}
             aria-current={tabSelected ? 'page' : undefined}
           >
-            Não Entregues
+            Sem Veículo
 
             <span
               className="text-red-600 hidden ml-1 py-0.5 px-1.5 rounded-full text-sm font-medium md:inline-block"

@@ -21,6 +21,7 @@ import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
+import { UpdatePedidoVeiculoPoligonoDto } from './dto/update-pedido-veiculo-poligono.dto';
 
 @Controller('pedidos')
 export class PedidosController {
@@ -152,5 +153,15 @@ export class PedidosController {
   @Post('pedido-poligono')
   createPedidoPoligono(@Body() dto: CreatePedidoPoligonoDto) {
     return this.pedidosService.createPedidoPoligono(dto);
+  }
+
+  @Post('roterizar-poligono')
+  savePolygonRouter(@Body() dto: UpdatePedidoVeiculoPoligonoDto) {
+    return this.pedidosService.saveDeliveriesPolygon(dto);
+  }
+
+  @Get('area-rodizio')
+  async getAreaRodizio() {
+    return this.pedidosService.getAreaRodizio();
   }
 }

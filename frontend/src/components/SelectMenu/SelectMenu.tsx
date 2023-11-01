@@ -3,16 +3,23 @@ import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import classNames from 'classnames'
 import { DeliveryVehicle } from '../../services/types/Delivery'
+import { formatCurrency, formatNumber } from '../../services/utils/formatNumber'
 
 type Props = {
-  vehicles: DeliveryVehicle[]
+  vehicles: DeliveryVehicle[];
+  handleSelectVehicle: (vehicleId: DeliveryVehicle) => void;
 }
 
-export default function SelectMenu({ vehicles }: Props) {
-  const [selected, setSelected] = useState(vehicles[3])
+export default function SelectMenu({ vehicles, handleSelectVehicle }: Props) {
+  const [selected, setSelected] = useState<DeliveryVehicle>(vehicles[0])
+
+  function handleOnChange(vehicle: DeliveryVehicle) {
+    setSelected(vehicle);
+    handleSelectVehicle(vehicle)
+  }
 
   return (
-    <Listbox value={selected} onChange={setSelected}>
+    <Listbox value={selected} onChange={(value) => handleOnChange(value)}>
       {({ open }) => (
         <>
           <Listbox.Label className="block text-sm font-medium leading-6 text-gray-900">Veículos</Listbox.Label>
@@ -20,7 +27,9 @@ export default function SelectMenu({ vehicles }: Props) {
             <Listbox.Button className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6">
               <span className="inline-flex w-full truncate">
                 <span className="truncate">{selected.placa}</span>
-                <span className="ml-2 truncate text-gray-500">{selected.peso}</span>
+                <span className="ml-2 truncate text-gray-500">{formatNumber(selected.capacidade)} KG</span>
+                <span className="ml-2 truncate text-gray-500">{formatNumber(selected.peso)} KG</span>
+                <span className="ml-2 truncate text-gray-500">{formatNumber(selected.percentual)}%</span>
               </span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                 <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -53,7 +62,13 @@ export default function SelectMenu({ vehicles }: Props) {
                             {vehicle.placa}
                           </span>
                           <span className={classNames(active ? 'text-indigo-200' : 'text-gray-500', 'ml-2 truncate')}>
-                            {vehicle.pedidos}
+                            {formatNumber(vehicle.capacidade)} KG
+                          </span>
+                          <span className={classNames(active ? 'text-indigo-200' : 'text-gray-500', 'ml-2 truncate')}>
+                            {formatNumber(vehicle.peso)} KG
+                          </span>
+                          <span className={classNames(active ? 'text-indigo-200' : 'text-gray-500', 'ml-2 truncate')}>
+                            {formatNumber(vehicle.percentual)}%
                           </span>
                         </div>
 

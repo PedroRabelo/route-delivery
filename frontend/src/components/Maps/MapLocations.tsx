@@ -11,9 +11,10 @@ interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
   drawingEnable?: boolean;
   handleSetBounds: (bounds: Bound[]) => void;
+  polygonPath: Bound[];
 }
 
-export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds }: MapProps) {
+export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, polygonPath }: MapProps) {
   const mapRef = useRef<GoogleMap>();
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager>();
   const center = useMemo<LatLngLiteral>(
@@ -33,6 +34,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds }:
   const [infoWindowPos, setInfoWindowPos] = useState<LatLngLiteral>();
   const [renderInfoWindow, setRenderInfowWindow] = useState(false);
   const [infoWindowData, setInfoWindowData] = useState<DeliveryPoints>({} as DeliveryPoints);
+  const [bounds, setBounds] = useState<Bound[]>([])
 
   const onLoad = useCallback((map: any) => (mapRef.current = map), []);
 
@@ -46,21 +48,35 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds }:
   const onPolygonComplete = (polygon: google.maps.Polygon) => {
     drawingManagerRef?.current?.setDrawingMode(null);
     var polygonBounds = polygon.getPath();
-    var bounds: Bound[] = [];
+    var boundsArr: Bound[] = [];
     for (var i = 0; i < polygonBounds.getLength(); i++) {
       var point: Bound = {
         lat: polygonBounds.getAt(i).lat(),
         lng: polygonBounds.getAt(i).lng(),
       };
-      bounds.push(point);
+      boundsArr.push(point);
     }
 
-    handleSetBounds(bounds);
+    handleSetBounds(boundsArr);
+    setBounds(boundsArr);
   };
 
   const onLoadDrawing = (drawingManager: any) => {
     drawingManagerRef.current = drawingManager;
   };
+
+  const onLoadPolygon = (polygon: google.maps.Polygon) => {
+    console.log("polygon: ", polygon);
+  }
+
+  const polygonOptions = {
+    fillOpacity: 0.3,
+    fillColor: '#ff0000',
+    strokeColor: '#ff0000',
+    strokeWeight: 2,
+    draggable: false,
+    editable: false
+  }
 
   return (
     <GoogleMap
@@ -122,7 +138,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds }:
         </InfoWindow>
       }
 
-      {drawingEnable &&
+      {drawingEnable && bounds.length === 0 &&
         <>
           <DrawingManagerF
             onPolygonComplete={onPolygonComplete}
@@ -137,6 +153,12 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds }:
           />
         </>
       }
+
+      <Polygon
+        onLoad={(event) => onLoadPolygon(event)}
+        paths={polygonPath}
+        options={polygonOptions}
+      />
     </GoogleMap>
   )
 }

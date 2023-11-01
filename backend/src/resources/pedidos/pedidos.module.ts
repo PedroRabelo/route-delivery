@@ -10,9 +10,21 @@ import { VeiculosService } from './veiculos.service';
 import { VeiculoZona } from '../zonas/entities/veiculo-zona.entity';
 import { PedidoPoligono } from './entities/pedido-poligono.entity';
 import { PedidoPoligonoCoords } from './entities/pedido-poligono-coords.entity';
+import { PedidosRoterizados } from './entities/pedidos-roterizados.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Pedido, Roteiro, Veiculo, VeiculoZona, PedidoPoligono, PedidoPoligonoCoords])],
+  imports: [
+    TypeOrmModule.forFeature(
+      [
+        Pedido,
+        Roteiro,
+        Veiculo,
+        VeiculoZona,
+        PedidoPoligono,
+        PedidoPoligonoCoords,
+        PedidosRoterizados,
+      ]
+    )],
   controllers: [PedidosController, VeiculosController],
   providers: [PedidosService, VeiculosService],
 })

@@ -15,6 +15,7 @@ import { DeliveriesMap } from "./components/DeliveriesMap";
 import { DeliveriesVehicle } from "./components/DeliveriesVehicles";
 import { DeliveriesWithoutVehicle } from "./components/DeliveriesWithoutVehicle";
 import { VehiclesList } from "./components/VehiclesList";
+import { Bound } from "../../components/Maps";
 
 const requiredText = "Campo obrigatório";
 
@@ -46,12 +47,21 @@ export function RoutesDelivery() {
   const [deliveryWithoutVehicle, setDeliveryWithoutVehicle] = useState<DeliveryPoints[]>();
   const [route, setRoute] = useState<DeliveryRoute>();
   const [licensePlate, setLicensePlate] = useState('');
+  const [areaRodizioBounds, setAreaRodizioBounds] = useState<Bound[]>([]);
 
   const newDeliveryForm = useForm<NewDeliveryFormData>({
     resolver: zodResolver(deliveryFormValidationSchema),
   })
 
   const { formState: { errors }, handleSubmit, register, getValues } = newDeliveryForm
+
+  async function fetchDeliveries() {
+    if (route?.data) {
+      await fetchDeliveriesPoints();
+      await fetchDeliveriesVehicles();
+      await fetchDeliveriesWithoutVehicle();
+    }
+  }
 
   useEffect(() => {
     async function getRoute() {
@@ -60,12 +70,31 @@ export function RoutesDelivery() {
       setRoute(response.data);
     }
 
+    async function getAreaRodizio() {
+      const response = await api.get(`/pedidos/area-rodizio`);
+
+      const coords: Bound[] = []
+      response.data.map((coord: { latitude: number; longitude: number; }) => {
+        coords.push({
+          lat: coord.latitude,
+          lng: coord.longitude
+        })
+      })
+
+      setAreaRodizioBounds(coords);
+    }
+
     try {
       getRoute();
+      getAreaRodizio();
     } catch (error) {
       console.log(error);
     }
   }, []);
+
+  useEffect(() => {
+    fetchDeliveries();
+  }, [route])
 
   const onSubmit: SubmitHandler<NewDeliveryFormData> = async (data) => {
     setDeliveryPoints([]);
@@ -80,11 +109,7 @@ export function RoutesDelivery() {
       setIsLoading(true);
       await api.post("/pedidos/entregas", body);
 
-      if (route?.data) {
-        await fetchDeliveriesPoints();
-        await fetchDeliveriesVehicles();
-        await fetchDeliveriesWithoutVehicle();
-      }
+      fetchDeliveries();
       setIsLoading(false);
     } catch (e) {
       console.log(e);
@@ -276,6 +301,7 @@ export function RoutesDelivery() {
             deliveryPoints={deliveryPoints}
             deliveryVehicles={deliveryVehicles}
             deliveryWithoutVehicle={deliveryWithoutVehicle}
+            areaRodizio={areaRodizioBounds}
           />
         }
         {tabSelected == 2 &&

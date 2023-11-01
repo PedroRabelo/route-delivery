@@ -5,15 +5,17 @@ import { slicePedidosIntoChunks } from 'src/common/utils/sliceArrayIntoChunks';
 import { validadeFileData } from 'src/common/utils/validadeFileData';
 import { Repository } from 'typeorm';
 import { ChangeVeiculoPedido } from './dto/change-veiculo-pedido.dto';
+import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
+import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
+import { UpdatePedidoVeiculoPoligonoDto } from './dto/update-pedido-veiculo-poligono.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
+import { PedidoPoligono } from './entities/pedido-poligono.entity';
 import { Pedido } from './entities/pedido.entity';
+import { PedidosRoterizados } from './entities/pedidos-roterizados.entity';
 import { Roteiro } from './entities/roteiro.entity';
 import { Veiculo } from './entities/veiculo.entity';
-import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
-import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
-import { PedidoPoligono } from './entities/pedido-poligono.entity';
 
 @Injectable()
 export class PedidosService {
@@ -25,7 +27,9 @@ export class PedidosService {
     @InjectRepository(Veiculo)
     private veiculoRepository: Repository<Veiculo>,
     @InjectRepository(PedidoPoligono)
-    private pedidoPoligonoRepository: Repository<PedidoPoligono>
+    private pedidoPoligonoRepository: Repository<PedidoPoligono>,
+    @InjectRepository(PedidosRoterizados)
+    private pedidoRoterizadoRepository: Repository<PedidosRoterizados>
   ) { }
 
   async create(createPedidoDto: CreatePedidoDto[]) {
@@ -366,15 +370,98 @@ export class PedidosService {
     try {
       const pedidoPoligono = await this.pedidoPoligonoRepository.save(createPedidoPoligonoDto);
 
-      // TODO - Chamar procedure que busca os pedidos na área do polígono
+      await this.pedidoRepository.query(
+        `EXEC gerar_poligono_pedidos @0, @1`,
+        [createPedidoPoligonoDto.roteiroId, pedidoPoligono.id]
+      )
+
+      const resumo = await this.pedidoRepository.query(
+        `
+        SELECT 
+          pp.ID id,
+        	pp.locais,
+        	pp.notas,
+        	pp.peso_total pesoTotal,
+        	pp.valor_total valorTotal,
+        	pp.loc_rod locaisRodizio,
+        	pp.notas_rod notasRodizio,
+        	pp.peso_rod pesoRodizio,
+        	pp.valor_rod valorRodizio,
+        	pp.loc_fora_Rod locaisForaRodizio,
+        	pp.notas_fora_rod notasForaRodizio,
+        	pp.peso_fora_rod pesoForaRodizio,
+        	pp.valor_fora_rod valorForaRodizio
+        FROM 
+        	PEDIDOS_POLIGONO pp  
+        WHERE 
+        	pp.ID = @0;
+        `,
+        [pedidoPoligono.id]
+      );
+
+      const pedidos = await this.pedidoRepository.query(
+        `
+        SELECT 
+         ped.ID as id, 
+         vei.PLACA as placa, 
+         ped.CLIENTE as cliente, 
+         ped.LATITUDE as latitude, 
+         ped.LONGITUDE as longitude, 
+         vei.ORD_CAR as ordem,
+         ped.Bruto as peso,
+         ped.Total as valor
+        FROM 
+        	PEDIDOS_POLIGONO_ITENS ppi 
+        	INNER JOIN PEDIDOS ped on ppi.pedido_id = ped.ID 
+         	LEFT JOIN VEICULOS vei ON vei.ID = ped.ID_VEICULO 
+        WHERE
+        	ppi.pedido_poligono_id = @0
+        ORDER BY 
+        	1;
+        `,
+        [pedidoPoligono.id]
+      );
 
       return {
-        id: pedidoPoligono.id,
-        roteiro: pedidoPoligono.roteiroId
+        resumo, pedidos
       }
     } catch (error) {
       console.log(error);
       throw error;
     }
+  }
+
+  async saveDeliveriesPolygon(dto: UpdatePedidoVeiculoPoligonoDto) {
+    // TODO Verificar a questão da numeração da ordem
+
+    dto.pedidos.map(async (d) => {
+      await this.pedidoRepository.update(d, { veiculoId: dto.veiculoId, placa: dto.placa });
+      await this.pedidoRoterizadoRepository.save({
+        pedidoId: d,
+        veiculoId: dto.veiculoId
+      })
+    });
+  }
+
+
+  async getAreaRodizio() {
+    const area = await this.pedidoRepository.query(
+      `
+      SELECT
+        arll.ID id,
+        arll.LATITUDE latitude,
+        arll.LONGITUDE longitude 
+      FROM
+        AREA_RODIZIO_LAT_LONG arll 
+      ORDER BY
+        ID
+      `
+    )
+
+    if (area.length > 0) {
+      area.push(area[0])
+    }
+
+    return area;
   }
 }
