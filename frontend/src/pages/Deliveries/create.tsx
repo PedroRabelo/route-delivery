@@ -207,7 +207,7 @@ export function CreateDelivery() {
       </form>
 
       <div className='flex-1 grow'>
-        <MapLocations deliveryPoints={deliveriesByTruck} handleSetBounds={() => null} />
+        <MapLocations deliveryPoints={deliveriesByTruck} handleSetBounds={() => null} polygonPath={[]} />
       </div>
 
       <DeliveryTable
