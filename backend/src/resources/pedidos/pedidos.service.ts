@@ -170,7 +170,7 @@ export class PedidosService {
         PED.CLIENTE as cliente, 
         PED.LATITUDE as latitude, 
         PED.LONGITUDE as longitude, 
-        VEIC.ORD_CAR as ordem,
+        PED.ORDEM as ordem,
         PED.Bruto as peso,
         PED.Total as valor
       FROM 
@@ -407,7 +407,7 @@ export class PedidosService {
          ped.CLIENTE as cliente, 
          ped.LATITUDE as latitude, 
          ped.LONGITUDE as longitude, 
-         vei.ORD_CAR as ordem,
+         ped.ordem as ordem,
          ped.Bruto as peso,
          ped.Total as valor
         FROM 
@@ -432,10 +432,15 @@ export class PedidosService {
   }
 
   async saveDeliveriesPolygon(dto: UpdatePedidoVeiculoPoligonoDto) {
-    // TODO Verificar a questão da numeração da ordem
+    const ordem = await this.pedidoRepository.query(
+      `
+      select max(ISNULL(p.ORDEM, 0) + 1) ordem from PEDIDOS p where p.roteiroId = @0
+      `,
+      [dto.roteiroId]
+    )
 
     dto.pedidos.map(async (d) => {
-      await this.pedidoRepository.update(d, { veiculoId: dto.veiculoId, placa: dto.placa });
+      await this.pedidoRepository.update(d, { veiculoId: dto.veiculoId, placa: dto.placa, ordem: ordem[0].ordem });
       await this.pedidoRoterizadoRepository.save({
         pedidoId: d,
         veiculoId: dto.veiculoId
@@ -463,5 +468,14 @@ export class PedidosService {
     }
 
     return area;
+  }
+
+  async clearRoutesByDate(routeDate: string) {
+    await this.pedidoRepository.query(
+      `
+        exec limpar_tudo @0
+      `,
+      [routeDate]
+    )
   }
 }

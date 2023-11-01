@@ -60,6 +60,9 @@ export class Pedido {
   @ManyToOne(() => Roteiro, (roteiro) => roteiro.pedidos)
   roteiro: Roteiro;
 
+  @Column({ name: 'ORDEM' })
+  ordem: number;
+
   constructor(partial: Partial<Pedido>) {
     Object.assign(this, partial);
   }

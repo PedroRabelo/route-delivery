@@ -74,6 +74,7 @@ export type UpdatePedidoVeiculoPoligonoDto = {
   pedidos: number[];
   veiculoId: number;
   placa: string;
+  roteiroId: number;
 }
 
 type DiaSemana = {

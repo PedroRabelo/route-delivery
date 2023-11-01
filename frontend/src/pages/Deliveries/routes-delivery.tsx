@@ -53,7 +53,7 @@ export function RoutesDelivery() {
     resolver: zodResolver(deliveryFormValidationSchema),
   })
 
-  const { formState: { errors }, handleSubmit, register, getValues } = newDeliveryForm
+  const { formState: { errors }, handleSubmit, register, getValues, reset } = newDeliveryForm
 
   async function fetchDeliveries() {
     if (route?.data) {
@@ -139,6 +139,14 @@ export function RoutesDelivery() {
     fetchDeliveriesPoints();
     fetchDeliveriesVehicles();
     fetchDeliveriesWithoutVehicle();
+  }
+
+  async function clearRoutes() {
+    setIsLoading(true)
+    await api.post(`/pedidos/limpar-dia`, { startDate: route?.data })
+    fetchUpdateDeliveries();
+    reset();
+    setIsLoading(false)
   }
 
   async function exportDeliveries(params: NewDeliveryFormData) {
@@ -236,7 +244,7 @@ export function RoutesDelivery() {
                   </div>
                 </div>
 
-                <div className="flex flex-row items-center gap-2 md:col-span-4">
+                <div className="flex flex-row items-center gap-2 md:col-span-6">
                   <div>
                     <Button
                       title="Calcular entregas"
@@ -253,6 +261,16 @@ export function RoutesDelivery() {
                       type="button"
                       onClick={() => exportDeliveries(getValues())}
                       disabled={isLoading}
+                      loading={isLoading}
+                    />
+                  </div>
+                  <div>
+                    <Button
+                      title="Limpar"
+                      color="primary"
+                      type="button"
+                      onClick={() => clearRoutes()}
+                      disabled={isLoading || route?.data === undefined}
                       loading={isLoading}
                     />
                   </div>

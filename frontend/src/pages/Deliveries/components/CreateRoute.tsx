@@ -69,7 +69,8 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
     const payload: UpdatePedidoVeiculoPoligonoDto = {
       pedidos: deliveriesPolygon.map(d => d.id),
       veiculoId: vehicleSelected?.id,
-      placa: vehicleSelected.placa
+      placa: vehicleSelected.placa,
+      roteiroId: +id!
     }
 
     setIsLoading(true);

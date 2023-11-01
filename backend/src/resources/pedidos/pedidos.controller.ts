@@ -22,6 +22,7 @@ import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
 import { UpdatePedidoVeiculoPoligonoDto } from './dto/update-pedido-veiculo-poligono.dto';
+import { LimparParamsDto } from './dto/limpar-params.dto';
 
 @Controller('pedidos')
 export class PedidosController {
@@ -163,5 +164,11 @@ export class PedidosController {
   @Get('area-rodizio')
   async getAreaRodizio() {
     return this.pedidosService.getAreaRodizio();
+  }
+
+  @Post('limpar-dia')
+  clearRoutesByDate(@Body() dto: LimparParamsDto) {
+    dto.startDate = format(parseISO(dto.startDate), 'dd-MM-yyyy');
+    return this.pedidosService.clearRoutesByDate(dto.startDate);
   }
 }
