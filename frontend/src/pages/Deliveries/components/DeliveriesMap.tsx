@@ -28,7 +28,7 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
     libraries: libraries,
   });
 
-  const [tabBarSelected, setTabBarSelected] = useState('Entregues');
+  const [tabBarSelected, setTabBarSelected] = useState('Não Entregues');
   const [deliveriesFiltered, setDeliveriesFiltered] = useState(deliveryPoints);
   const [drawingEnable, setDrawingEnable] = useState(false);
   const [bounds, setBounds] = useState<Bound[]>([]);
@@ -40,8 +40,8 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
   totalNaoEntregues = deliveryWithoutVehicle?.length!;
 
   useEffect(() => {
-    setDeliveriesFiltered(deliveryPoints)
-  }, [deliveryPoints])
+    setDeliveriesFiltered(deliveryWithoutVehicle)
+  }, [deliveryWithoutVehicle])
 
   useEffect(() => {
     if (tabBarSelected === 'Entregues') {
@@ -64,12 +64,9 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
 
   function filterPoints(points: DeliveryPoints[]) {
     if (points.length === 0) {
-      setDeliveriesFiltered(deliveryPoints)
+      setDeliveriesFiltered(deliveryWithoutVehicle)
     } else {
-      const orders = points.flatMap(m => m.placa);
-      const filteredPoints = deliveryPoints?.filter(p => orders.includes(p.placa))
-
-      setDeliveriesFiltered(filteredPoints)
+      setDeliveriesFiltered(points)
     }
   }
 
@@ -77,6 +74,14 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
     setBounds([]);
     window.location.reload();
   }
+
+  /* Filtrar pedidos do veículo
+  1 - Criar componente para ser exibido quando filtrar por veículo
+  2 - Neste componente irá exibir os pedidos agrupado por veículo, com a opção de filtrar os pedidos no mapa
+  3 - Opção para transferir pedido selecionado para outro veículo
+  4 - Modal para selecionar o veículo
+
+  */
 
   if (!isLoaded) return <div>Loading...</div>;
 

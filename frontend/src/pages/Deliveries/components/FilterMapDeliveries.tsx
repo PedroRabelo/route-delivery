@@ -105,7 +105,6 @@ export function FilterMapDeliveries({
               title="Filtrar"
               color="primary"
               type="button"
-              disabled={selectedDelivery.length === 0}
               onClick={() => handleFilterPoints(selectedDelivery)}
             />
             <div className="inline-block min-w-full py-2 align-middle">

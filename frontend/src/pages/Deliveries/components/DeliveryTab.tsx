@@ -10,7 +10,7 @@ type Props = {
 }
 
 export default function DeliveryTab({ handleChangeTabBar, deliveries }: Props) {
-  const [tabSelected, setTabSelected] = useState('Entregues')
+  const [tabSelected, setTabSelected] = useState('Não Entregues')
 
   return (
     <div>
