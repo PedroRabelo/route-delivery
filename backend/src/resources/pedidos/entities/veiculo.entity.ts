@@ -43,4 +43,7 @@ export class Veiculo {
 
   @Column({ name: 'ORD_CAR' })
   ordem: number;
+
+  @Column({ name: 'USADO' })
+  possuiPedidos: boolean;
 }

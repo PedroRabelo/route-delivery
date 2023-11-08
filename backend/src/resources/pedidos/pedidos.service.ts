@@ -446,6 +446,8 @@ export class PedidosService {
         veiculoId: dto.veiculoId
       })
     });
+
+    await this.veiculoRepository.update(dto.veiculoId, { possuiPedidos: true });
   }
 
 
