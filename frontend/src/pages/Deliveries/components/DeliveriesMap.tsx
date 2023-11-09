@@ -2,10 +2,12 @@ import { useLoadScript } from "@react-google-maps/api";
 import { Bound, MapLocations } from "../../../components/Maps";
 import { DeliveryPoints, DeliveryVehicle } from "../../../services/types/Delivery";
 import DeliveryTab from "./DeliveryTab";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FilterMapDeliveries } from "./FilterMapDeliveries";
 import { Button } from "../../../components/Button";
 import { CreateRoute } from "./CreateRoute";
+import { FilterMapDeliveriesVehicles } from "./FilterMapDeliveriesVehicles";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 interface MapProps {
   deliveryPoints: DeliveryPoints[] | undefined;
@@ -32,6 +34,7 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
   const [deliveriesFiltered, setDeliveriesFiltered] = useState(deliveryPoints);
   const [drawingEnable, setDrawingEnable] = useState(false);
   const [bounds, setBounds] = useState<Bound[]>([]);
+  const [showDeliveriesVehicle, setShowDeliveriesVehicle] = useState(false);
 
   let totalEntregues = 0;
   let totalNaoEntregues = 0;
@@ -75,13 +78,15 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
     window.location.reload();
   }
 
-  /* Filtrar pedidos do veículo
-  1 - Criar componente para ser exibido quando filtrar por veículo
-  2 - Neste componente irá exibir os pedidos agrupado por veículo, com a opção de filtrar os pedidos no mapa
-  3 - Opção para transferir pedido selecionado para outro veículo
-  4 - Modal para selecionar o veículo
+  function handleFilterByVehicles(vehicles: DeliveryVehicle[]) {
+    setShowDeliveriesVehicle(true);
+    filterPointsByVehicle(vehicles);
+  }
 
-  */
+  function backToVehicleList() {
+    setShowDeliveriesVehicle(false);
+    filterPointsByVehicle([]);
+  }
 
   if (!isLoaded) return <div>Loading...</div>;
 
@@ -110,18 +115,35 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
             />
           }
         </div>
-        {bounds.length > 0 ?
+        {bounds.length > 0 &&
           <CreateRoute
             bounds={bounds}
             deliveryVehicles={deliveryVehicles}
-          /> :
+          />
+        }
+
+        {bounds.length <= 0 && !showDeliveriesVehicle ?
           <FilterMapDeliveries
             tabBarSelected={tabBarSelected}
             deliveryVehicles={deliveryVehicles}
             deliveryWithoutVehicles={deliveryWithoutVehicle}
-            handleFilterByVehicles={(vehicles) => filterPointsByVehicle(vehicles)}
+            handleFilterByVehicles={(vehicles) => handleFilterByVehicles(vehicles)}
             handleFilterPoints={(points) => filterPoints(points)}
-          />
+          /> :
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => backToVehicleList()}
+              className="inline-flex items-center px-0 py-0 border border-transparent text-base font-medium rounded-md"
+            >
+              <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              Voltar
+            </button>
+            <FilterMapDeliveriesVehicles
+              deliveryPoints={deliveriesFiltered}
+              handleFilterPoints={(points) => filterPoints(points)}
+            />
+          </div>
         }
       </div>
       <div className='flex-1 grow h-[66vh]'>

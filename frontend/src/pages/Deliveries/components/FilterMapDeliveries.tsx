@@ -58,6 +58,12 @@ export function FilterMapDeliveries({
                       >
                         Valor(R$)
                       </th>
+                      <th
+                        scope="col"
+                        className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                      >
+                        Carga(%)
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
@@ -87,6 +93,9 @@ export function FilterMapDeliveries({
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {formatCurrency(truck.valor)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatNumber(truck.percentual)}
                         </td>
                       </tr>
                     ))}
