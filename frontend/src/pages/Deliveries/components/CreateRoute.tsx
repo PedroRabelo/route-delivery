@@ -1,28 +1,28 @@
+import classNames from "classnames";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "../../../components/Button";
 import { Bound } from "../../../components/Maps";
-import { CreateDeliveryPolygonDTO, CreateDeliveryPolygonDTOCoordsDTO, DeliveryPoints, DeliveryVehicle, PolygonDeliveriesSummary, UpdatePedidoVeiculoPoligonoDto } from "../../../services/types/Delivery";
-import { useEffect, useState } from "react";
-import { api } from "../../../lib/axios";
-import { formatCurrency, formatNumber } from "../../../services/utils/formatNumber";
 import SelectMenu from "../../../components/SelectMenu/SelectMenu";
-import classNames from "classnames";
-import Alert from "../../../components/Alert";
+import { api } from "../../../lib/axios";
+import { CreateDeliveryPolygonDTO, CreateDeliveryPolygonDTOCoordsDTO, DeliveryPoints, DeliveryVehicle, PolygonDeliveriesSummary, UpdatePedidoVeiculoPoligonoDto } from "../../../services/types/Delivery";
+import { Vehicle } from "../../../services/types/Vehicle";
+import { formatCurrency, formatNumber } from "../../../services/utils/formatNumber";
 
 type Props = {
   handleFilterPoints?: (points: DeliveryPoints[]) => void;
   bounds: Bound[];
-  deliveryVehicles: DeliveryVehicle[] | undefined;
 }
 
-export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Props) {
+export function CreateRoute({ handleFilterPoints, bounds }: Props) {
   const { id } = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [deliveriesPolygon, setDeliveriesPolygon] = useState<DeliveryPoints[]>([])
   const [deliveriesSummary, setDeliveriesSummary] = useState<PolygonDeliveriesSummary>()
   const [tabSelected, setTabSelected] = useState<'Resumo' | 'Pedidos'>('Resumo')
-  const [vehicleSelected, setVehicleSelected] = useState<DeliveryVehicle>()
+  const [vehicles, setVehicles] = useState<Vehicle[]>([])
+  const [vehicleSelected, setVehicleSelected] = useState<Vehicle>()
 
   async function fetchDeliveriesByPolygon() {
     try {
@@ -43,8 +43,9 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
       setIsLoading(true);
       const response = await api.post('pedidos/pedido-poligono', body);
 
-      setDeliveriesPolygon(response.data.pedidos);
+      setDeliveriesPolygon(response.data.pedidos)
       setDeliveriesSummary(response.data.resumo[0])
+      setVehicles(response.data.veiculos)
 
       setIsLoading(false)
     } catch (e: any) {
@@ -68,8 +69,8 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
 
     const payload: UpdatePedidoVeiculoPoligonoDto = {
       pedidos: deliveriesPolygon.map(d => d.id),
-      veiculoId: vehicleSelected?.id,
-      placa: vehicleSelected.placa,
+      veiculoId: vehicleSelected!.id,
+      placa: vehicleSelected!.placa,
       roteiroId: +id!
     }
 
@@ -83,10 +84,11 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
 
   return (
     <div className="flex flex-col gap-3">
-      {deliveryVehicles && deliveryVehicles.length > 0 &&
+      {vehicles && vehicles.length > 0 && deliveriesSummary !== undefined &&
         <SelectMenu
-          vehicles={deliveryVehicles}
+          vehicles={vehicles}
           handleSelectVehicle={(vehicle) => setVehicleSelected(vehicle)}
+          deliveriesWeight={deliveriesSummary?.pesoTotal}
         />
       }
 
@@ -130,28 +132,63 @@ export function CreateRoute({ handleFilterPoints, bounds, deliveryVehicles }: Pr
         tabSelected === 'Resumo' && deliveriesSummary !== undefined &&
         <div>
           <div>
-            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
+            <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-2 shadow sm:p-2">
                 <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
                   {deliveriesSummary?.locais} Pedidos
                 </dd>
               </div>
-              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
+              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-2 shadow sm:p-2">
                 <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
                   {deliveriesSummary?.notas} Notas
                 </dd>
               </div>
-              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
+              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-2 shadow sm:p-2">
                 <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
                   {formatNumber(deliveriesSummary?.pesoTotal!)} Kg Carga total
                 </dd>
               </div>
 
-              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-5 shadow sm:p-4">
+              <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-2 shadow sm:p-2">
                 <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
                   {formatCurrency(deliveriesSummary?.valorTotal!)} Total
                 </dd>
               </div>
+
+              {deliveriesSummary.locaisRodizio > 0 &&
+                <>
+                  <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-2 shadow sm:p-2">
+                    <span className="text-red-400 font-bold">Dentro do rodízio</span>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {deliveriesSummary?.locaisRodizio} pedidos
+                    </dd>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {deliveriesSummary?.notasRodizio} notas
+                    </dd>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {formatNumber(deliveriesSummary?.pesoRodizio!)} Kg carga
+                    </dd>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {formatCurrency(deliveriesSummary?.valorRodizio!)} Total
+                    </dd>
+                  </div>
+                  <div className="overflow-hidden rounded-lg bg-gray-100 px-4 py-2 shadow sm:p-2">
+                    <span className="text-green-400 font-bold">Fora do rodízio</span>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {deliveriesSummary?.locaisForaRodizio} pedidos
+                    </dd>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {deliveriesSummary?.notasForaRodizio} notas
+                    </dd>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {formatNumber(deliveriesSummary?.pesoForaRodizio!)} Kg carga
+                    </dd>
+                    <dd className="mt-1 text-base font-semibold tracking-tight text-gray-900">
+                      {formatCurrency(deliveriesSummary?.valorForaRodizio!)} Total
+                    </dd>
+                  </div>
+                </>
+              }
             </dl>
           </div>
         </div>

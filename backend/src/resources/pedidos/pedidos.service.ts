@@ -422,8 +422,31 @@ export class PedidosService {
         [pedidoPoligono.id]
       );
 
+      const veiculos = await this.veiculoRepository.query(
+        `
+        SELECT 
+        	v.ID id,
+        	v.PLACA placa,
+        	v.CAPACIDADE capacidade,
+        	v.ativo ativo,
+        	v.ESTA_RODIZIO temRodizio,
+        	v.PERC_CHEIO percentualCheio,
+        	v.MAX_LOCAL qtdLocais,
+        	v.COD_FROTA codigoFrota,
+        	v.PESO_MINIMO pesoMinimo,
+        	v.MIN_LOCAL qtdMinLocais
+        FROM 
+        	dbo.VEICULOS v 
+        WHERE 
+        	v.ativo = 1
+        	AND USADO = 0
+        ORDER BY 
+        	PRI_ESCOLHA 
+        `
+      );
+
       return {
-        resumo, pedidos
+        resumo, pedidos, veiculos
       }
     } catch (error) {
       console.log(error);

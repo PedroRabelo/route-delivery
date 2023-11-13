@@ -49,8 +49,10 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
   useEffect(() => {
     if (tabBarSelected === 'Entregues') {
       setDeliveriesFiltered(deliveryPoints);
+      setBounds([])
     } else if (tabBarSelected === 'Não Entregues') {
       setDeliveriesFiltered(deliveryWithoutVehicle);
+      setBounds([])
     }
   }, [tabBarSelected]);
 
@@ -79,12 +81,12 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
   }
 
   function handleFilterByVehicles(vehicles: DeliveryVehicle[]) {
-    setShowDeliveriesVehicle(true);
+    //setShowDeliveriesVehicle(true);
     filterPointsByVehicle(vehicles);
   }
 
   function backToVehicleList() {
-    setShowDeliveriesVehicle(false);
+    //setShowDeliveriesVehicle(false);
     filterPointsByVehicle([]);
   }
 
@@ -118,33 +120,33 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
         {bounds.length > 0 &&
           <CreateRoute
             bounds={bounds}
-            deliveryVehicles={deliveryVehicles}
           />
         }
 
-        {bounds.length <= 0 && !showDeliveriesVehicle ?
-          <FilterMapDeliveries
-            tabBarSelected={tabBarSelected}
-            deliveryVehicles={deliveryVehicles}
-            deliveryWithoutVehicles={deliveryWithoutVehicle}
-            handleFilterByVehicles={(vehicles) => handleFilterByVehicles(vehicles)}
-            handleFilterPoints={(points) => filterPoints(points)}
-          /> :
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={() => backToVehicleList()}
-              className="inline-flex items-center px-0 py-0 border border-transparent text-base font-medium rounded-md"
-            >
-              <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-              Voltar
-            </button>
-            <FilterMapDeliveriesVehicles
-              deliveryPoints={deliveriesFiltered}
+        {bounds.length <= 0 && (
+          !showDeliveriesVehicle ?
+            <FilterMapDeliveries
+              tabBarSelected={tabBarSelected}
+              deliveryVehicles={deliveryVehicles}
+              deliveryWithoutVehicles={deliveryWithoutVehicle}
+              handleFilterByVehicles={(vehicles) => handleFilterByVehicles(vehicles)}
               handleFilterPoints={(points) => filterPoints(points)}
-            />
-          </div>
-        }
+            /> :
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => backToVehicleList()}
+                className="inline-flex items-center px-0 py-0 border border-transparent text-base font-medium rounded-md"
+              >
+                <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                Voltar
+              </button>
+              <FilterMapDeliveriesVehicles
+                deliveryPoints={deliveriesFiltered}
+                handleFilterPoints={(points) => filterPoints(points)}
+              />
+            </div>
+        )}
       </div>
       <div className='flex-1 grow h-[66vh]'>
         <MapLocations
