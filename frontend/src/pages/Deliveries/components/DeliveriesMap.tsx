@@ -100,7 +100,7 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
             handleChangeTabBar={(tab) => setTabBarSelected(tab)}
             deliveries={{ withTruck: totalEntregues, noTruck: totalNaoEntregues }}
           />
-          {bounds.length === 0 &&
+          {/* {bounds.length === 0 &&
             <Button
               title="Polígono"
               color="primary"
@@ -115,7 +115,7 @@ export function DeliveriesMap({ deliveryPoints, deliveryVehicles, deliveryWithou
               type="button"
               onClick={() => cleanPolygon()}
             />
-          }
+          } */}
         </div>
         {bounds.length > 0 &&
           <CreateRoute

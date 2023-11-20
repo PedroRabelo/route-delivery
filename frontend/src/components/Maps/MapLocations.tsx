@@ -21,6 +21,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
     () => ({ lat: -23.5298971, lng: -46.749152 }),
     []
   );
+  const polygonRef = useRef<google.maps.Polygon>();
   const options = useMemo<MapOptions>(
     () => ({
       disableDefaultUI: true,
@@ -36,7 +37,9 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
   const [infoWindowData, setInfoWindowData] = useState<DeliveryPoints>({} as DeliveryPoints);
   const [bounds, setBounds] = useState<Bound[]>([])
 
-  const onLoad = useCallback((map: any) => (mapRef.current = map), []);
+  const onLoad = useCallback((map: any) => {
+    mapRef.current = map
+  }, []);
 
   function loadInfoWindow(point: DeliveryPoints) {
     setInfoWindowPos({ lat: point.latitude, lng: point.longitude });
@@ -59,6 +62,27 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
 
     handleSetBounds(boundsArr);
     setBounds(boundsArr);
+
+    polygonRef.current?.setPaths(polygon.getPath());
+
+    polygon.setVisible(false)
+  };
+
+  const onPolygonEditComplete = (polygon: google.maps.Polygon) => {
+    var polygonBounds = polygon.getPath();
+    var boundsArr: Bound[] = [];
+    for (var i = 0; i < polygonBounds.getLength(); i++) {
+      var point: Bound = {
+        lat: polygonBounds.getAt(i).lat(),
+        lng: polygonBounds.getAt(i).lng(),
+      };
+      boundsArr.push(point);
+    }
+
+    handleSetBounds(boundsArr);
+    setBounds(boundsArr);
+
+    polygonRef.current?.setPaths(polygon.getPath());
   };
 
   const onLoadDrawing = (drawingManager: any) => {
@@ -66,7 +90,11 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
   };
 
   const onLoadPolygon = (polygon: google.maps.Polygon) => {
-    console.log("polygon: ", polygon);
+    polygonRef.current = polygon;
+  }
+
+  const onLoadPolygonRouter = (polygon: google.maps.Polygon) => {
+
   }
 
   const polygonOptions = {
@@ -138,7 +166,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
         </InfoWindow>
       }
 
-      {drawingEnable && bounds.length === 0 &&
+      {bounds.length === 0 &&
         <>
           <DrawingManagerF
             onPolygonComplete={onPolygonComplete}
@@ -154,8 +182,20 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
         </>
       }
 
+      {bounds.length !== 0 &&
+        <Polygon
+          onLoad={(event) => onLoadPolygon(event)}
+          paths={bounds}
+          options={defaultOptions}
+          draggable={true}
+          editable={true}
+          onMouseUp={() => onPolygonEditComplete(polygonRef.current!)}
+        />
+      }
+
+
       <Polygon
-        onLoad={(event) => onLoadPolygon(event)}
+        onLoad={(event) => onLoadPolygonRouter(event)}
         paths={polygonPath}
         options={polygonOptions}
       />
@@ -164,10 +204,12 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
 }
 
 const defaultOptions = {
-  strokeOpacity: 0.5,
-  strokeWeight: 2,
+  strokeWeight: 3,
   clickable: false,
   draggable: false,
-  editable: false,
+  editable: true,
   visible: true,
+  fillOpacity: 0.3,
+  fillColor: '#52c754',
+  strokeColor: '#52c754',
 };
