@@ -35,7 +35,6 @@ export type DeliveryVehicle = {
   valor: number;
   percentual: number;
   poligonoId: number;
-  ordemPedido: number;
 };
 
 export type DeliveryRoute = {
