@@ -1,15 +1,26 @@
-import { MapIcon, MapPinIcon, QueueListIcon, TableCellsIcon, TruckIcon } from "@heroicons/react/24/outline";
+import {
+  MapIcon,
+  MapPinIcon,
+  QueueListIcon,
+  TableCellsIcon,
+  TruckIcon,
+} from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { utils, writeFile } from "xlsx";
-import * as zod from 'zod';
+import * as zod from "zod";
 import { Button } from "../../components/Button";
 import { FormInput } from "../../components/Form";
 import { api } from "../../lib/axios";
-import { DeliveryPoints, DeliveryRoute, DeliveryVehicle, VehicleDeliveries } from "../../services/types/Delivery";
+import {
+  DeliveryPoints,
+  DeliveryRoute,
+  DeliveryVehicle,
+  VehicleDeliveries,
+} from "../../services/types/Delivery";
 import { formatDateOnly } from "../../services/utils/formatDateOnly";
 import { DeliveriesMap } from "./components/DeliveriesMap";
 import { DeliveriesVehicle } from "./components/DeliveriesVehicles";
@@ -25,35 +36,42 @@ const deliveryFormValidationSchema = zod.object({
   area2: zod.string().min(1, requiredText),
 });
 
-type NewDeliveryFormData = zod.infer<typeof deliveryFormValidationSchema>
+type NewDeliveryFormData = zod.infer<typeof deliveryFormValidationSchema>;
 
 const tabs = [
-  { id: 1, name: 'Mapa', icon: MapIcon },
-  { id: 2, name: 'Rotas', icon: MapPinIcon },
-  { id: 3, name: 'Pedidos sem veículo', icon: QueueListIcon },
+  { id: 1, name: "Mapa", icon: MapIcon },
+  { id: 2, name: "Rotas", icon: MapPinIcon },
+  { id: 3, name: "Pedidos sem veículo", icon: QueueListIcon },
   // { id: 4, name: 'Simulações', icon: TableCellsIcon },
-  { id: 5, name: 'Veículos', icon: TruckIcon },
-]
+  { id: 5, name: "Veículos", icon: TruckIcon },
+];
 
 export function RoutesDelivery() {
-
   const { id } = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [tabSelected, setTabSelected] = useState(1);
-  const [vehicleDeliveries, setVehicleDeliveries] = useState<VehicleDeliveries>();
+  const [vehicleDeliveries, setVehicleDeliveries] =
+    useState<VehicleDeliveries>();
   const [deliveryPoints, setDeliveryPoints] = useState<DeliveryPoints[]>();
   const [deliveryVehicles, setDeliveryVehicles] = useState<DeliveryVehicle[]>();
-  const [deliveryWithoutVehicle, setDeliveryWithoutVehicle] = useState<DeliveryPoints[]>();
+  const [deliveryWithoutVehicle, setDeliveryWithoutVehicle] =
+    useState<DeliveryPoints[]>();
   const [route, setRoute] = useState<DeliveryRoute>();
-  const [licensePlate, setLicensePlate] = useState('');
+  const [licensePlate, setLicensePlate] = useState("");
   const [areaRodizioBounds, setAreaRodizioBounds] = useState<Bound[]>([]);
 
   const newDeliveryForm = useForm<NewDeliveryFormData>({
     resolver: zodResolver(deliveryFormValidationSchema),
-  })
+  });
 
-  const { formState: { errors }, handleSubmit, register, getValues, reset } = newDeliveryForm
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+    getValues,
+    reset,
+  } = newDeliveryForm;
 
   async function fetchDeliveries() {
     if (route?.data) {
@@ -73,13 +91,13 @@ export function RoutesDelivery() {
     async function getAreaRodizio() {
       const response = await api.get(`/pedidos/area-rodizio`);
 
-      const coords: Bound[] = []
-      response.data.map((coord: { latitude: number; longitude: number; }) => {
+      const coords: Bound[] = [];
+      response.data.map((coord: { latitude: number; longitude: number }) => {
         coords.push({
           lat: coord.latitude,
-          lng: coord.longitude
-        })
-      })
+          lng: coord.longitude,
+        });
+      });
 
       setAreaRodizioBounds(coords);
     }
@@ -94,16 +112,16 @@ export function RoutesDelivery() {
 
   useEffect(() => {
     fetchDeliveries();
-  }, [route])
+  }, [route]);
 
   const onSubmit: SubmitHandler<NewDeliveryFormData> = async (data) => {
     setDeliveryPoints([]);
-    setLicensePlate('');
+    setLicensePlate("");
 
     const body = {
       startDate: route?.data,
-      ...data
-    }
+      ...data,
+    };
 
     try {
       setIsLoading(true);
@@ -115,7 +133,7 @@ export function RoutesDelivery() {
       console.log(e);
       setIsLoading(false);
     }
-  }
+  };
 
   async function fetchDeliveriesPoints() {
     const response = await api.get(`/pedidos/dia/${id}`);
@@ -142,17 +160,29 @@ export function RoutesDelivery() {
   }
 
   async function clearRoutes() {
-    setIsLoading(true)
-    await api.post(`/pedidos/limpar-dia`, { startDate: route?.data })
+    setIsLoading(true);
+    await api.post(`/pedidos/limpar-dia`, { startDate: route?.data });
     fetchUpdateDeliveries();
     reset();
-    setIsLoading(false)
+    setIsLoading(false);
+  }
+
+  async function clearPolygon() {
+    setIsLoading(true);
+    await api.post(`/pedidos/limpar-poligono`, { startDate: route?.data });
+    fetchUpdateDeliveries();
+    reset();
+    setIsLoading(false);
   }
 
   async function exportDeliveries(params: NewDeliveryFormData) {
     try {
-      if (params.area1 === '' || params.area2 === '' || params.distance === '') {
-        alert('Informe a distância e os quadrantes');
+      if (
+        params.area1 === "" ||
+        params.area2 === "" ||
+        params.distance === ""
+      ) {
+        alert("Informe a distância e os quadrantes");
         return;
       }
 
@@ -178,11 +208,11 @@ export function RoutesDelivery() {
             Data da entrega
           </h2>
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            {route && route.data !== null &&
+            {route && route.data !== null && (
               <label className="block text-lg font-bold text-gray-700 mb-1">
                 {formatDateOnly(route.data)}
               </label>
-            }
+            )}
           </h2>
         </div>
         <div className="pl-8">
@@ -274,6 +304,16 @@ export function RoutesDelivery() {
                       loading={isLoading}
                     />
                   </div>
+                  <div>
+                    <Button
+                      title="Limpar Polígono"
+                      color="primary"
+                      type="button"
+                      onClick={() => clearPolygon()}
+                      disabled={isLoading || route?.data === undefined}
+                      loading={isLoading}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -291,17 +331,19 @@ export function RoutesDelivery() {
                     href="#"
                     className={classNames(
                       tab.id === tabSelected
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
-                      'group inline-flex items-center border-b-2 py-4 px-1 text-sm font-medium'
+                        ? "border-indigo-500 text-indigo-600"
+                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                      "group inline-flex items-center border-b-2 py-4 px-1 text-sm font-medium"
                     )}
-                    aria-current={tab.id === tabSelected ? 'page' : undefined}
+                    aria-current={tab.id === tabSelected ? "page" : undefined}
                     onClick={() => setTabSelected(tab.id)}
                   >
                     <tab.icon
                       className={classNames(
-                        tab.id === tabSelected ? 'text-indigo-500' : 'text-gray-400 group-hover:text-gray-500',
-                        '-ml-0.5 mr-2 h-5 w-5'
+                        tab.id === tabSelected
+                          ? "text-indigo-500"
+                          : "text-gray-400 group-hover:text-gray-500",
+                        "-ml-0.5 mr-2 h-5 w-5"
                       )}
                       aria-hidden="true"
                     />
@@ -314,34 +356,27 @@ export function RoutesDelivery() {
         </div>
       </div>
       <div className="flex-1">
-        {tabSelected == 1 &&
+        {tabSelected == 1 && (
           <DeliveriesMap
             deliveryPoints={deliveryPoints}
             deliveryVehicles={deliveryVehicles}
             deliveryWithoutVehicle={deliveryWithoutVehicle}
             areaRodizio={areaRodizioBounds}
           />
-        }
-        {tabSelected == 2 &&
+        )}
+        {tabSelected == 2 && (
           <DeliveriesVehicle
             trucks={deliveryVehicles}
             handleFetchUpdateDeliveries={() => fetchUpdateDeliveries()}
             deliveryPoints={deliveryPoints}
           />
-        }
-        {tabSelected == 3 &&
-          <DeliveriesWithoutVehicle
-            deliveries={deliveryWithoutVehicle}
-          />
-        }
+        )}
+        {tabSelected == 3 && (
+          <DeliveriesWithoutVehicle deliveries={deliveryWithoutVehicle} />
+        )}
 
-        {tabSelected == 5 &&
-          <VehiclesList
-            deliveries={deliveryPoints}
-          />
-        }
-
+        {tabSelected == 5 && <VehiclesList deliveries={deliveryPoints} />}
       </div>
     </div>
-  )
+  );
 }

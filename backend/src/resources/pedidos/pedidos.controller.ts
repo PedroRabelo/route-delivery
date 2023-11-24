@@ -26,7 +26,7 @@ import { LimparParamsDto } from './dto/limpar-params.dto';
 
 @Controller('pedidos')
 export class PedidosController {
-  constructor(private readonly pedidosService: PedidosService) { }
+  constructor(private readonly pedidosService: PedidosService) {}
 
   @Post('upload-sheet')
   @UseInterceptors(FileInterceptor('file', { dest: '/tmp/' }))
@@ -170,5 +170,11 @@ export class PedidosController {
   clearRoutesByDate(@Body() dto: LimparParamsDto) {
     dto.startDate = format(parseISO(dto.startDate), 'dd-MM-yyyy');
     return this.pedidosService.clearRoutesByDate(dto.startDate);
+  }
+
+  @Post('limpar-poligono')
+  clearPolygonByDate(@Body() dto: LimparParamsDto) {
+    dto.startDate = format(parseISO(dto.startDate), 'dd-MM-yyyy');
+    return this.pedidosService.clearPolygonByDate(dto.startDate);
   }
 }

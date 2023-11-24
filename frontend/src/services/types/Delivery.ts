@@ -18,19 +18,24 @@ export type DeliveryPoints = {
   peso: number;
   valor: number;
   observacao: string;
+  ordemPedido: number;
 };
 
 export type DeliveryVehicle = {
   id: number;
   ordem: number;
   placa: string;
+  pesoMin: number;
   capacidade: number;
+  sobra: number;
   rodizio: string;
   locais: number;
   pedidos: number;
   peso: number;
   valor: number;
   percentual: number;
+  poligonoId: number;
+  ordemPedido: number;
 };
 
 export type DeliveryRoute = {
@@ -47,12 +52,12 @@ export type VehicleDeliveries = {
 export type CreateDeliveryPolygonDTO = {
   roteiroId: number;
   coordenadas: CreateDeliveryPolygonDTOCoordsDTO[];
-}
+};
 
 export type CreateDeliveryPolygonDTOCoordsDTO = {
   latitude: number;
   longitude: number;
-}
+};
 
 export type PolygonDeliveriesSummary = {
   id: number;
@@ -68,46 +73,45 @@ export type PolygonDeliveriesSummary = {
   notasForaRodizio: number;
   pesoForaRodizio: number;
   valorForaRodizio: number;
-}
+};
 
 export type UpdatePedidoVeiculoPoligonoDto = {
   pedidos: number[];
   veiculoId: number;
   placa: string;
   roteiroId: number;
-}
+};
 
 type DiaSemana = {
   id: string;
   name: string;
   title: string;
-}
+};
 
 const diasSemana: DiaSemana[] = [
   {
-    id: '2',
-    name: 'SEGUNDA-FEIRA',
-    title: 'SEG'
+    id: "2",
+    name: "SEGUNDA-FEIRA",
+    title: "SEG",
   },
   {
-    id: '3',
-    name: 'TERÇA-FEIRA',
-    title: 'TER'
+    id: "3",
+    name: "TERÇA-FEIRA",
+    title: "TER",
   },
   {
-    id: '4',
-    name: 'QUARTA-FEIRA',
-    title: 'QUA'
+    id: "4",
+    name: "QUARTA-FEIRA",
+    title: "QUA",
   },
   {
-    id: '5',
-    name: 'QUINTA-FEIRA',
-    title: 'QUI'
+    id: "5",
+    name: "QUINTA-FEIRA",
+    title: "QUI",
   },
   {
-    id: '6',
-    name: 'SEXTA-FEIRA',
-    title: 'SEX'
-  }
-
-]
+    id: "6",
+    name: "SEXTA-FEIRA",
+    title: "SEX",
+  },
+];

@@ -1,18 +1,26 @@
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { DeliveryPoints, VehicleDeliveries } from "../../../services/types/Delivery";
-import { formatCurrency, formatNumber } from "../../../services/utils/formatNumber";
+import {
+  DeliveryPoints,
+  VehicleDeliveries,
+} from "../../../services/types/Delivery";
+import {
+  formatCurrency,
+  formatNumber,
+} from "../../../services/utils/formatNumber";
 
 type Props = {
   handleClearVehicle: () => void;
   vehicleDeliveries: VehicleDeliveries;
-}
+};
 
-export function DeliveriesInfo({ handleClearVehicle, vehicleDeliveries }: Props) {
-
+export function DeliveriesInfo({
+  handleClearVehicle,
+  vehicleDeliveries,
+}: Props) {
   const { vehicle, orders } = vehicleDeliveries;
 
   function filterOrders(licensePlate: string) {
-    return orders?.filter(point => point.placa === licensePlate);
+    return orders?.filter((point) => point.placa === licensePlate);
   }
 
   const ordersFiltered = filterOrders(vehicle.placa);
@@ -28,7 +36,9 @@ export function DeliveriesInfo({ handleClearVehicle, vehicleDeliveries }: Props)
           <ArrowLeftIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
           Voltar
         </button>
-        <h3 className="text-lg font-medium leading-6 text-gray-900">Pedidos por Veículo</h3>
+        <h3 className="text-lg font-medium leading-6 text-gray-900">
+          Pedidos por Veículo
+        </h3>
       </div>
 
       <div className="flex gap-4 p-4">
@@ -94,21 +104,28 @@ export function DeliveriesInfo({ handleClearVehicle, vehicleDeliveries }: Props)
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {ordersFiltered && ordersFiltered?.length > 0 && ordersFiltered.map((delivery) => (
-                <tr key={delivery.id}>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-ellipsis">{delivery.cliente}</td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {formatNumber(delivery.peso)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {formatCurrency(delivery.valor)}
-                  </td>
-                </tr>
-              ))}
+              {ordersFiltered &&
+                ordersFiltered?.length > 0 &&
+                ordersFiltered.map((delivery) => (
+                  <tr key={delivery.id}>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-ellipsis">
+                      {delivery.ordemPedido}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 text-ellipsis">
+                      {delivery.cliente}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {formatNumber(delivery.peso)}
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                      {formatCurrency(delivery.valor)}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  )
+  );
 }

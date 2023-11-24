@@ -29,8 +29,8 @@ export class PedidosService {
     @InjectRepository(PedidoPoligono)
     private pedidoPoligonoRepository: Repository<PedidoPoligono>,
     @InjectRepository(PedidosRoterizados)
-    private pedidoRoterizadoRepository: Repository<PedidosRoterizados>
-  ) { }
+    private pedidoRoterizadoRepository: Repository<PedidosRoterizados>,
+  ) {}
 
   async create(createPedidoDto: CreatePedidoDto[]) {
     try {
@@ -38,11 +38,12 @@ export class PedidosService {
 
       console.log(createPedidoDto[0].entrega instanceof Date);
 
-
       if (createPedidoDto[0].entrega instanceof Date) {
         dataFormatada = createPedidoDto[0].entrega;
       } else {
-        const dataEntregaString = (createPedidoDto[0].entrega as string).toString();
+        const dataEntregaString = (
+          createPedidoDto[0].entrega as string
+        ).toString();
 
         const dataEntregaSplit = dataEntregaString.split('/');
 
@@ -170,9 +171,10 @@ export class PedidosService {
         PED.CLIENTE as cliente, 
         PED.LATITUDE as latitude, 
         PED.LONGITUDE as longitude, 
-        PED.ORDEM as ordem,
+        VEIC.ORD_CAR as ordem,
         PED.Bruto as peso,
-        PED.Total as valor
+        PED.Total as valor,
+        PED.ordem as ordemPedido
       FROM 
         PEDIDOS PED 
         INNER JOIN VEICULOS VEIC ON VEIC.ID = PED.ID_VEICULO 
@@ -302,15 +304,15 @@ export class PedidosService {
     const pedidosVeiculo1 = await this.pedidoRepository.find({
       where: {
         roteiro: { id: dto.roteiroId },
-        veiculoId: dto.veiculo1Id
-      }
+        veiculoId: dto.veiculo1Id,
+      },
     });
 
     const pedidosVeiculo2 = await this.pedidoRepository.find({
       where: {
         roteiro: { id: dto.roteiroId },
-        veiculoId: dto.veiculo2Id
-      }
+        veiculoId: dto.veiculo2Id,
+      },
     });
 
     if (pedidosVeiculo1 !== null && pedidosVeiculo1.length > 0) {
@@ -319,28 +321,26 @@ export class PedidosService {
           ...vei1,
           veiculoId: dto.veiculo2Id,
           placa: dto.placa2,
-        }
+        };
       });
 
       await this.pedidoRepository.save(novoVeiculoPedidos1);
     }
 
     if (pedidosVeiculo2 !== null && pedidosVeiculo2.length > 0) {
-
-
       const novoVeiculoPedidos2: Pedido[] = pedidosVeiculo2.map((vei2) => {
         return {
           ...vei2,
           veiculoId: dto.veiculo1Id,
           placa: dto.placa1,
-        }
+        };
       });
 
       await this.pedidoRepository.save(novoVeiculoPedidos2);
     }
 
-    await this.veiculoRepository.update(dto.veiculo1Id, { ordem: dto.ordem2 })
-    await this.veiculoRepository.update(dto.veiculo2Id, { ordem: dto.ordem1 })
+    await this.veiculoRepository.update(dto.veiculo1Id, { ordem: dto.ordem2 });
+    await this.veiculoRepository.update(dto.veiculo2Id, { ordem: dto.ordem1 });
   }
 
   async removeVehicleRoute(dto: DeleteRouteVehicleDTO) {
@@ -349,9 +349,9 @@ export class PedidosService {
         where: {
           veiculoId: dto.veiculoId,
           roteiro: {
-            id: dto.roteiroId
-          }
-        }
+            id: dto.roteiroId,
+          },
+        },
       });
 
       if (deliveries.length === 0) {
@@ -359,7 +359,10 @@ export class PedidosService {
       }
 
       deliveries.map(async (d) => {
-        await this.pedidoRepository.update(d.id, { veiculoId: null, placa: null });
+        await this.pedidoRepository.update(d.id, {
+          veiculoId: null,
+          placa: null,
+        });
       });
     } catch (error) {
       console.log(error);
@@ -368,12 +371,14 @@ export class PedidosService {
 
   async createPedidoPoligono(createPedidoPoligonoDto: CreatePedidoPoligonoDto) {
     try {
-      const pedidoPoligono = await this.pedidoPoligonoRepository.save(createPedidoPoligonoDto);
+      const pedidoPoligono = await this.pedidoPoligonoRepository.save(
+        createPedidoPoligonoDto,
+      );
 
-      await this.pedidoRepository.query(
-        `EXEC gerar_poligono_pedidos @0, @1`,
-        [createPedidoPoligonoDto.roteiroId, pedidoPoligono.id]
-      )
+      await this.pedidoRepository.query(`EXEC gerar_poligono_pedidos @0, @1`, [
+        createPedidoPoligonoDto.roteiroId,
+        pedidoPoligono.id,
+      ]);
 
       const resumo = await this.pedidoRepository.query(
         `
@@ -396,7 +401,7 @@ export class PedidosService {
         WHERE 
         	pp.ID = @0;
         `,
-        [pedidoPoligono.id]
+        [pedidoPoligono.id],
       );
 
       const pedidos = await this.pedidoRepository.query(
@@ -419,7 +424,7 @@ export class PedidosService {
         ORDER BY 
         	1;
         `,
-        [pedidoPoligono.id]
+        [pedidoPoligono.id],
       );
 
       const veiculos = await this.veiculoRepository.query(
@@ -442,12 +447,14 @@ export class PedidosService {
         	AND USADO = 0
         ORDER BY 
         	PRI_ESCOLHA 
-        `
+        `,
       );
 
       return {
-        resumo, pedidos, veiculos
-      }
+        resumo,
+        pedidos,
+        veiculos,
+      };
     } catch (error) {
       console.log(error);
       throw error;
@@ -457,22 +464,25 @@ export class PedidosService {
   async saveDeliveriesPolygon(dto: UpdatePedidoVeiculoPoligonoDto) {
     const ordem = await this.pedidoRepository.query(
       `
-      select max(ISNULL(p.ORDEM, 0) + 1) ordem from PEDIDOS p where p.roteiroId = @0
+      select max(ISNULL(v.ORD_CAR , 0) + 1) ordem from VEICULOS v inner join PEDIDOS p on v.ID  = p.ID_VEICULO where p.roteiroId = @0
       `,
-      [dto.roteiroId]
-    )
+      [dto.roteiroId],
+    );
 
     dto.pedidos.map(async (d) => {
-      await this.pedidoRepository.update(d, { veiculoId: dto.veiculoId, placa: dto.placa, ordem: ordem[0].ordem });
+      await this.pedidoRepository.update(d, {
+        veiculoId: dto.veiculoId,
+        placa: dto.placa,
+        ordem: ordem[0].ordem,
+      });
       await this.pedidoRoterizadoRepository.save({
         pedidoId: d,
-        veiculoId: dto.veiculoId
-      })
+        veiculoId: dto.veiculoId,
+      });
     });
 
     await this.veiculoRepository.update(dto.veiculoId, { possuiPedidos: true });
   }
-
 
   async getAreaRodizio() {
     const area = await this.pedidoRepository.query(
@@ -485,11 +495,11 @@ export class PedidosService {
         AREA_RODIZIO_LAT_LONG arll 
       ORDER BY
         ID
-      `
-    )
+      `,
+    );
 
     if (area.length > 0) {
-      area.push(area[0])
+      area.push(area[0]);
     }
 
     return area;
@@ -500,7 +510,16 @@ export class PedidosService {
       `
         exec limpar_tudo @0
       `,
-      [routeDate]
-    )
+      [routeDate],
+    );
+  }
+
+  async clearPolygonByDate(routeDate: string) {
+    await this.pedidoRepository.query(
+      `
+        exec limpar_poligono @0
+      `,
+      [routeDate],
+    );
   }
 }
