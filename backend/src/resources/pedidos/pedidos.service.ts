@@ -473,7 +473,6 @@ export class PedidosService {
       await this.pedidoRepository.update(d, {
         veiculoId: dto.veiculoId,
         placa: dto.placa,
-        ordem: ordem[0].ordem,
       });
       await this.pedidoRoterizadoRepository.save({
         pedidoId: d,
