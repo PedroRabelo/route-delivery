@@ -222,8 +222,10 @@ export class PedidosService {
   async getRoutes() {
     try {
       const roteiros = await this.roteiroRepository.find({
-        order: { dataEntrega: 'DESC' },
+        order: { id: 'DESC' },
       });
+
+      console.log(roteiros);
       return roteiros?.map((res) => ({
         id: res.id,
         data: res.dataEntrega,

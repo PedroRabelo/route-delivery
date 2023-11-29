@@ -8,3 +8,11 @@ export function formatDateOnly(responseDate: Date) {
 
   return format(new Date(result), "dd/MM/yyyy", { locale: ptBR });
 }
+
+export function formatDatetime(responseDate: Date) {
+  const dateStr: string = new Date(responseDate).toString();
+  const date = new Date(dateStr);
+  const result = new Date(date.toISOString().slice(0, -1));
+
+  return format(new Date(result), "dd/MM/yyyy HH:mm", { locale: ptBR });
+}

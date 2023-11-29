@@ -15,7 +15,10 @@ import { Button } from "../../components/Button";
 import { DataTableActions } from "../../components/DataTable/data-table-actions";
 import { api } from "../../lib/axios";
 import { DeliveryRoute } from "../../services/types/Delivery";
-import { formatDateOnly } from "../../services/utils/formatDateOnly";
+import {
+  formatDateOnly,
+  formatDatetime,
+} from "../../services/utils/formatDateOnly";
 
 export default function Deliveries() {
   const [routes, setRoutes] = useState<DeliveryRoute[]>([]);
@@ -26,6 +29,7 @@ export default function Deliveries() {
 
   async function getRoutes() {
     const response = await api.get("/pedidos/roteiros");
+
     setRoutes(response.data);
   }
 
@@ -154,12 +158,6 @@ export default function Deliveries() {
                       </th>
                       <th
                         scope="col"
-                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                      >
-                        Data Inclusão
-                      </th>
-                      <th
-                        scope="col"
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                       >
                         Status
@@ -186,10 +184,6 @@ export default function Deliveries() {
                           </td>
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                             {formatDateOnly(delivery.data)}
-                          </td>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                            {delivery.dataInclusao !== null &&
-                              formatDateOnly(delivery.dataInclusao)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             {delivery?.status}
