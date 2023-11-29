@@ -74,30 +74,15 @@ export class PedidosService {
         pedidoValido.entrega = dataFormatada;
       }
 
-      console.log(dataFormatada);
-
-      const roteiroCadastrado = await this.roteiroRepository.findOne({
-        where: { dataEntrega: dataFormatada },
-      });
-
       let roteiro = new Roteiro();
-      if (roteiroCadastrado) {
-        await this.pedidoRepository.query(
-          'delete from PEDIDOS where Entrega = @0',
-          [dataFormatada],
-        );
-        roteiro = roteiroCadastrado;
 
-        roteiro.status = 'AGUARDANDO_LAT_LONG';
-        await this.roteiroRepository.save(roteiro);
-      } else {
-        const novoRoteiro = new Roteiro();
-        novoRoteiro.dataEntrega = dataFormatada;
-        novoRoteiro.status = 'AGUARDANDO_LAT_LONG';
+      const novoRoteiro = new Roteiro();
+      novoRoteiro.dataEntrega = dataFormatada;
+      novoRoteiro.status = 'AGUARDANDO_LAT_LONG';
+      novoRoteiro.dataInclusao = new Date();
 
-        await this.roteiroRepository.save(novoRoteiro);
-        roteiro = novoRoteiro;
-      }
+      await this.roteiroRepository.save(novoRoteiro);
+      roteiro = novoRoteiro;
 
       roteiro.pedidos = [];
       for await (const dto of createPedidoDto) {
@@ -119,6 +104,7 @@ export class PedidosService {
           id: roteiro.id,
           data: roteiro.dataEntrega,
           status: roteiro.status,
+          dataInclusao: roteiro.dataInclusao,
         };
       } catch (error) {
         console.log(error);
@@ -145,11 +131,11 @@ export class PedidosService {
   async generateRoutes(params: PedidoParamsDto) {
     try {
       console.log(
-        `exec [RT_SP2] '${params.startDate}', ${params.distance}, ${params.area1}, ${params.area2}`,
+        `exec [RT_SP2] ${params.roteiroId}, ${params.distance}, ${params.area1}, ${params.area2}`,
       );
 
       await this.pedidoRepository.query('exec [RT_SP2] @0, @1, @2, @3', [
-        params.startDate,
+        params.roteiroId,
         params.distance,
         params.area1,
         params.area2,
@@ -242,6 +228,7 @@ export class PedidosService {
         id: res.id,
         data: res.dataEntrega,
         status: res.status,
+        dataInclusao: res.dataInclusao,
       }));
     } catch (error) {
       console.log(error);
@@ -363,6 +350,10 @@ export class PedidosService {
           veiculoId: null,
           placa: null,
         });
+      });
+
+      await this.veiculoRepository.update(dto.veiculoId, {
+        possuiPedidos: false,
       });
     } catch (error) {
       console.log(error);

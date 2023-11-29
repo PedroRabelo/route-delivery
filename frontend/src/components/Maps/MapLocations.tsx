@@ -1,7 +1,17 @@
-import { DrawingManagerF, GoogleMap, InfoWindow, Marker, MarkerClusterer, Polygon } from "@react-google-maps/api";
+import {
+  DrawingManagerF,
+  GoogleMap,
+  InfoWindow,
+  Marker,
+  MarkerClusterer,
+  Polygon,
+} from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DeliveryPoints } from '../../services/types/Delivery';
-import { formatCurrency, formatNumber } from "../../services/utils/formatNumber";
+import { DeliveryPoints } from "../../services/types/Delivery";
+import {
+  formatCurrency,
+  formatNumber,
+} from "../../services/utils/formatNumber";
 import { Bound } from "./MapDrawing";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
@@ -14,7 +24,12 @@ interface MapProps {
   polygonPath: Bound[];
 }
 
-export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, polygonPath }: MapProps) {
+export function MapLocations({
+  deliveryPoints,
+  drawingEnable,
+  handleSetBounds,
+  polygonPath,
+}: MapProps) {
   const mapRef = useRef<GoogleMap>();
   const drawingManagerRef = useRef<google.maps.drawing.DrawingManager>();
   const center = useMemo<LatLngLiteral>(
@@ -27,18 +42,22 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
       disableDefaultUI: true,
       clickableIcons: false,
       fullscreenControl: true,
-      styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }]
+      mapTypeId: "satellite",
+      mapTypeControl: true,
+      styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
     }),
     []
   );
 
   const [infoWindowPos, setInfoWindowPos] = useState<LatLngLiteral>();
   const [renderInfoWindow, setRenderInfowWindow] = useState(false);
-  const [infoWindowData, setInfoWindowData] = useState<DeliveryPoints>({} as DeliveryPoints);
-  const [bounds, setBounds] = useState<Bound[]>([])
+  const [infoWindowData, setInfoWindowData] = useState<DeliveryPoints>(
+    {} as DeliveryPoints
+  );
+  const [bounds, setBounds] = useState<Bound[]>([]);
 
   const onLoad = useCallback((map: any) => {
-    mapRef.current = map
+    mapRef.current = map;
   }, []);
 
   function loadInfoWindow(point: DeliveryPoints) {
@@ -65,7 +84,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
 
     polygonRef.current?.setPaths(polygon.getPath());
 
-    polygon.setVisible(false)
+    polygon.setVisible(false);
   };
 
   const onPolygonEditComplete = (polygon: google.maps.Polygon) => {
@@ -91,20 +110,18 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
 
   const onLoadPolygon = (polygon: google.maps.Polygon) => {
     polygonRef.current = polygon;
-  }
+  };
 
-  const onLoadPolygonRouter = (polygon: google.maps.Polygon) => {
-
-  }
+  const onLoadPolygonRouter = (polygon: google.maps.Polygon) => {};
 
   const polygonOptions = {
     fillOpacity: 0.3,
-    fillColor: '#ff0000',
-    strokeColor: '#ff0000',
+    fillColor: "#ff0000",
+    strokeColor: "#ff0000",
     strokeWeight: 2,
     draggable: false,
-    editable: false
-  }
+    editable: false,
+  };
 
   return (
     <GoogleMap
@@ -126,19 +143,19 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
         />
       ))} */}
 
-
       {deliveryPoints && deliveryPoints.length > 0 && (
         <>
-          <MarkerClusterer
-            maxZoom={12}
-            minimumClusterSize={20}
-            zoomOnClick
-          >
+          <MarkerClusterer maxZoom={12} minimumClusterSize={20} zoomOnClick>
             {(clusterer): any =>
               deliveryPoints?.map((point) => (
                 <Marker
                   key={point.id}
-                  position={{ lat: Number(point.latitude), lng: Number(point.longitude) } as LatLngLiteral}
+                  position={
+                    {
+                      lat: Number(point.latitude),
+                      lng: Number(point.longitude),
+                    } as LatLngLiteral
+                  }
                   clusterer={clusterer}
                   label={{
                     text: `${point.ordem}`, // codepoint from https://fonts.google.com/icons
@@ -153,20 +170,22 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
         </>
       )}
 
-      {renderInfoWindow &&
-        <InfoWindow
-          onLoad={onLoad}
-          position={infoWindowPos}
-        >
+      {renderInfoWindow && (
+        <InfoWindow onLoad={onLoad} position={infoWindowPos}>
           <div className="bg-white border-1 p-2">
-            <h1 className="mb-1">Placa: <b>{infoWindowData.placa}</b></h1>
+            <h1 className="mb-1">
+              Placa: <b>{infoWindowData.placa}</b>
+            </h1>
             <h1 className="mb-1">Cliente: {infoWindowData.cliente}</h1>
-            <h1>Valor: <b>{formatNumber(infoWindowData.peso)}KG</b> - <b>{formatCurrency(infoWindowData.valor)}</b></h1>
+            <h1>
+              Valor: <b>{formatNumber(infoWindowData.peso)}KG</b> -{" "}
+              <b>{formatCurrency(infoWindowData.valor)}</b>
+            </h1>
           </div>
         </InfoWindow>
-      }
+      )}
 
-      {bounds.length === 0 &&
+      {bounds.length === 0 && (
         <>
           <DrawingManagerF
             onPolygonComplete={onPolygonComplete}
@@ -180,9 +199,9 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
             }}
           />
         </>
-      }
+      )}
 
-      {bounds.length !== 0 &&
+      {bounds.length !== 0 && (
         <Polygon
           onLoad={(event) => onLoadPolygon(event)}
           paths={bounds}
@@ -191,8 +210,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
           editable={true}
           onMouseUp={() => onPolygonEditComplete(polygonRef.current!)}
         />
-      }
-
+      )}
 
       <Polygon
         onLoad={(event) => onLoadPolygonRouter(event)}
@@ -200,7 +218,7 @@ export function MapLocations({ deliveryPoints, drawingEnable, handleSetBounds, p
         options={polygonOptions}
       />
     </GoogleMap>
-  )
+  );
 }
 
 const defaultOptions = {
@@ -210,6 +228,6 @@ const defaultOptions = {
   editable: true,
   visible: true,
   fillOpacity: 0.3,
-  fillColor: '#52c754',
-  strokeColor: '#52c754',
+  fillColor: "#52c754",
+  strokeColor: "#52c754",
 };

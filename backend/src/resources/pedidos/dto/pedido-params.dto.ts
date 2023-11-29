@@ -2,7 +2,8 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class PedidoParamsDto {
   @IsNotEmpty()
-  startDate: string;
+  @IsNumber()
+  roteiroId: number;
 
   @IsNotEmpty()
   @IsNumber()

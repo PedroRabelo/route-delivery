@@ -41,6 +41,7 @@ export type DeliveryRoute = {
   id: number;
   data: Date;
   status: string;
+  dataInclusao: Date;
 };
 
 export type VehicleDeliveries = {

@@ -1,5 +1,15 @@
-import { ArrowPathIcon, ArrowUpOnSquareIcon, MapPinIcon } from "@heroicons/react/24/outline";
-import { ChangeEvent, SyntheticEvent, useEffect, useRef, useState } from "react";
+import {
+  ArrowPathIcon,
+  ArrowUpOnSquareIcon,
+  MapPinIcon,
+} from "@heroicons/react/24/outline";
+import {
+  ChangeEvent,
+  SyntheticEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Alert from "../../components/Alert";
 import { Button } from "../../components/Button";
 import { DataTableActions } from "../../components/DataTable/data-table-actions";
@@ -25,8 +35,7 @@ export default function Deliveries() {
 
   function handleSelectFile(e: SyntheticEvent) {
     e.preventDefault();
-    if (hiddenFileInput.current)
-      hiddenFileInput.current.click();
+    if (hiddenFileInput.current) hiddenFileInput.current.click();
   }
 
   function handleFileInput(e: ChangeEvent<HTMLInputElement>) {
@@ -49,7 +58,8 @@ export default function Deliveries() {
     formData.append("file", file!);
 
     try {
-      await api.post("/pedidos/upload-sheet", formData)
+      await api
+        .post("/pedidos/upload-sheet", formData)
         .then((res) => {
           alert("Salvo com sucesso");
           setIsLoading(false);
@@ -62,9 +72,8 @@ export default function Deliveries() {
           alert(e.message);
           setIsLoading(false);
         });
-
     } catch (error) {
-      console.log('Ocorreu um erro ao importar o arquivo');
+      console.log("Ocorreu um erro ao importar o arquivo");
     }
   }
 
@@ -73,8 +82,13 @@ export default function Deliveries() {
       <header className="bg-white shadow">
         <div className="sm:grid grid-cols-2 sm:justify-between mx-auto py-4 px-4 sm:px-6 lg:px-8 mb-6">
           <div className="flex flex-row items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Roteiro de entregas</h1>
-            <ArrowPathIcon className="h-8 w-8 pt-1 cursor-pointer text-teal-600 focus:text-white" onClick={() => getRoutes()} />
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Roteiro de entregas
+            </h1>
+            <ArrowPathIcon
+              className="h-8 w-8 pt-1 cursor-pointer text-teal-600 focus:text-white"
+              onClick={() => getRoutes()}
+            />
           </div>
 
           {/* <NavLink to="/delivery-create" title="Novo roteiro">
@@ -115,7 +129,9 @@ export default function Deliveries() {
         </div>
       </header>
 
-      {routes && routes?.length === 0 && <Alert>Nenhum Pedido cadastrado</Alert>}
+      {routes && routes?.length === 0 && (
+        <Alert>Nenhum Pedido cadastrado</Alert>
+      )}
       {routes && routes?.length > 0 && (
         <div className="flex flex-col">
           <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -128,7 +144,19 @@ export default function Deliveries() {
                         scope="col"
                         className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
                       >
+                        ID
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                      >
                         Data Entrega
+                      </th>
+                      <th
+                        scope="col"
+                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                      >
+                        Data Inclusão
                       </th>
                       <th
                         scope="col"
@@ -153,8 +181,15 @@ export default function Deliveries() {
                           key={delivery?.id}
                           className={index % 2 === 0 ? undefined : "bg-gray-50"}
                         >
+                          <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                            {delivery?.id}
+                          </td>
                           <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                             {formatDateOnly(delivery.data)}
+                          </td>
+                          <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                            {delivery.dataInclusao !== null &&
+                              formatDateOnly(delivery.dataInclusao)}
                           </td>
                           <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                             {delivery?.status}
@@ -162,25 +197,25 @@ export default function Deliveries() {
 
                           <td className="relative whitespace-nowrap py-3 pl-2 pr-2 text-right text-sm font-medium sm:pr-12">
                             <div className="flex justify-end gap-4">
-                              {delivery.status !== 'AGUARDANDO_LAT_LONG' &&
+                              {delivery.status !== "AGUARDANDO_LAT_LONG" && (
                                 <DataTableActions
                                   to={`/routes-delivery/${delivery.id}`}
                                   Icon={MapPinIcon}
                                   color="primary"
                                   title="Distribuir pedidos"
                                 />
-                              }
+                              )}
 
                               {/* <label>Aguarde processamento das rotas</label> */}
 
-                              {delivery.status === 'AGUARDANDO_LAT_LONG' &&
+                              {delivery.status === "AGUARDANDO_LAT_LONG" && (
                                 <DataTableActions
                                   to="#"
                                   Icon={MapPinIcon}
                                   color="danger"
                                   title="Processando"
                                 />
-                              }
+                              )}
                             </div>
                           </td>
                         </tr>
@@ -193,5 +228,5 @@ export default function Deliveries() {
         </div>
       )}
     </>
-  )
+  );
 }

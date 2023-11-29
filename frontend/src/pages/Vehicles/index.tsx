@@ -1,14 +1,23 @@
-import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import * as zod from 'zod';
+import * as zod from "zod";
 import { Button } from "../../components/Button";
 import { FormInput } from "../../components/Form";
 import { Toggle } from "../../components/Toggle/Toggle";
 import { api } from "../../lib/axios";
-import { AddZoneVehicleDTO, SaveVehicleDTO, Vehicle, VehicleZone } from "../../services/types/Vehicle";
+import {
+  AddZoneVehicleDTO,
+  SaveVehicleDTO,
+  Vehicle,
+  VehicleZone,
+} from "../../services/types/Vehicle";
 import { Zone } from "../../services/types/Zone";
 import { formatNumber } from "../../services/utils/formatNumber";
 const requiredText = "Campo obrigatório";
@@ -23,7 +32,7 @@ const vehicleFormValidationSchema = zod.object({
   pesoMinimo: zod.string().min(1, requiredText),
 });
 
-type NewVehicleFormData = zod.infer<typeof vehicleFormValidationSchema>
+type NewVehicleFormData = zod.infer<typeof vehicleFormValidationSchema>;
 
 export function Vehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>();
@@ -36,25 +45,31 @@ export function Vehicles() {
 
   const newVehicleForm = useForm<NewVehicleFormData>({
     resolver: zodResolver(vehicleFormValidationSchema),
-  })
+  });
 
-  const { formState: { errors }, handleSubmit, register, reset, setValue } = newVehicleForm
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+    reset,
+    setValue,
+  } = newVehicleForm;
 
   async function getVehicles() {
     try {
-      const response = await api.get('/veiculos');
+      const response = await api.get("/veiculos");
       setVehicles(response.data);
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
   async function getZones() {
     try {
-      const response = await api.get('/zonas');
+      const response = await api.get("/zonas");
       setZones(response.data);
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
@@ -75,19 +90,18 @@ export function Vehicles() {
           vehicleZones.push({
             zonaId: zone.zonaId,
             zona: zones.find((z) => z.id === zone.zonaId)?.titulo!,
-            prioridade: zone.prioridade
-          })
+            prioridade: zone.prioridade,
+          });
         });
         setVehicleZones(vehicleZones);
       }
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
   const onSubmit: SubmitHandler<NewVehicleFormData> = async (data) => {
     try {
-
       const body: SaveVehicleDTO = {
         placa: data.placa,
         temRodizio: temRodizio === 1 ? true : false,
@@ -96,15 +110,15 @@ export function Vehicles() {
         qtdLocais: parseInt(data.qtdLocais),
         codigoFrota: parseInt(data.codigoFrota),
         qtdMinLocais: parseInt(data.qtdMinLocais),
-        pesoMinimo: parseInt(data.pesoMinimo)
-      }
+        pesoMinimo: parseInt(data.pesoMinimo),
+      };
 
       setIsLoading(true);
 
       if (vehicleSelected) {
         await api.put(`veiculos/${vehicleSelected}`, body);
       } else {
-        await api.post('/veiculos', body);
+        await api.post("/veiculos", body);
       }
 
       getVehicles();
@@ -115,7 +129,7 @@ export function Vehicles() {
       console.log(e);
       alert(e.response.data.message);
     }
-  }
+  };
 
   function handleEditVehicle(vehicle: Vehicle) {
     reset();
@@ -139,9 +153,9 @@ export function Vehicles() {
     try {
       await api.patch(`/veiculos/${vehicleId}`, { ativo: !status });
 
-      const updatedVehicle = vehicles?.map(v => {
+      const updatedVehicle = vehicles?.map((v) => {
         if (v.id === vehicleId) {
-          return { ...v, ativo: !status }
+          return { ...v, ativo: !status };
         }
 
         return v;
@@ -149,29 +163,32 @@ export function Vehicles() {
 
       setVehicles(updatedVehicle);
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
   async function handleAddZone() {
     try {
-      if (vehicleZones.length > 0 && vehicleZones.some((zone) => zone.zonaId === zoneSelected)) {
-        alert('Zona já adicionada');
+      if (
+        vehicleZones.length > 0 &&
+        vehicleZones.some((zone) => zone.zonaId === zoneSelected)
+      ) {
+        alert("Zona já adicionada");
         return;
       }
 
       const body: AddZoneVehicleDTO = {
         zonaId: zoneSelected,
         veiculoId: vehicleSelected!,
-        prioridade: vehicleZones.length + 1
-      }
+        prioridade: vehicleZones.length + 1,
+      };
 
-      await api.post('veiculos/zona', body);
+      await api.post("veiculos/zona", body);
 
       getVehicleZones(vehicleSelected!);
       setZoneSelected(0);
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
@@ -180,23 +197,33 @@ export function Vehicles() {
       await api.delete(`veiculos/${vehicleSelected}/zona/${zoneId}`);
       getVehicleZones(vehicleSelected!);
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
-  async function handleSavePriority(zoneId: number, priority: number, action: "UP" | "DOWN") {
+  async function handleSavePriority(
+    zoneId: number,
+    priority: number,
+    action: "UP" | "DOWN"
+  ) {
     try {
       const newPriority: number = action === "UP" ? priority - 1 : priority + 1;
 
-      await api.patch(`veiculos/zonas/${vehicleSelected}/${zoneId}`, { prioridade: newPriority });
+      await api.patch(`veiculos/zonas/${vehicleSelected}/${zoneId}`, {
+        prioridade: newPriority,
+      });
       getVehicleZones(vehicleSelected!);
     } catch (error: any) {
-      alert(error.message)
+      alert(error.message);
     }
   }
 
   function getSumByKey(arr: any[], key: string | number) {
-    return arr.reduce((acc: number, current: { [x: string]: any; }) => acc + Number(current[key]), 0);
+    return arr.reduce(
+      (acc: number, current: { [x: string]: any }) =>
+        acc + Number(current[key]),
+      0
+    );
   }
 
   return (
@@ -208,75 +235,132 @@ export function Vehicles() {
               <table className="min-w-full divide-y divide-gray-300">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                    <th
+                      scope="col"
+                      className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                    >
                       Placa
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Cap.(Kg)
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Perc. Cheio(%)
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Peso Mínimo
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Máx. Locais
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Min. Locais
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Cód. Frota
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Rodízio
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
                       Ativo
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {vehicles && vehicles?.length > 0 && vehicles.map((vehicle) => (
-                    <tr key={vehicle.placa}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
-                        <a
-                          className={classNames(vehicleSelected === vehicle.id
-                            ? "text-indigo-500"
-                            : "text-gray-900",
-                            "cursor-pointer text-base font-bold")}
-                          onClick={() => handleEditVehicle(vehicle)}>
-                          {vehicle.placa}
-                        </a>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{formatNumber(vehicle.capacidade)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.percentualCheio}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{formatNumber(vehicle.pesoMinimo)}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.qtdLocais}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.qtdMinLocais}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.codigoFrota}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{vehicle.temRodizio ? 'SIM' : 'NÃO'}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <Toggle enabled={vehicle.ativo!} handleChangeToggle={() => handleChangeStatus(vehicle.ativo!, vehicle.id)} />
-                      </td>
-                    </tr>
-                  ))}
+                  {vehicles &&
+                    vehicles?.length > 0 &&
+                    vehicles.map((vehicle) => (
+                      <tr key={vehicle.placa}>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                          <a
+                            className={classNames(
+                              vehicleSelected === vehicle.id
+                                ? "text-indigo-500"
+                                : "text-gray-900",
+                              "cursor-pointer text-base font-bold"
+                            )}
+                            onClick={() => handleEditVehicle(vehicle)}
+                          >
+                            {vehicle.placa}
+                          </a>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatNumber(vehicle.capacidade)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vehicle.percentualCheio}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {formatNumber(vehicle.pesoMinimo)}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vehicle.qtdLocais}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vehicle.qtdMinLocais}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vehicle.codigoFrota}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {vehicle.temRodizio ? "SIM" : "NÃO"}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <Toggle
+                            enabled={vehicle.ativo!}
+                            handleChangeToggle={() =>
+                              handleChangeStatus(vehicle.ativo!, vehicle.id)
+                            }
+                          />
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
-                <tfoot>
-
-                </tfoot>
+                <tfoot></tfoot>
               </table>
             </div>
             <div className="pt-4">
-              {vehicles?.length && <div className="text-gray-900">
-                <span className="py-3 px-6 font-bold">
-                  {vehicles?.length} Veículos
-                </span>
-                <span className="py-3 px-6 font-bold">
-                  {formatNumber(getSumByKey(vehicles, 'capacidade'))}Kg
-                </span>
-              </div>}
+              {vehicles?.length && (
+                <div className="text-gray-900">
+                  <span className="py-3 px-6 font-bold">
+                    {vehicles.filter((v) => v.ativo).length} Veículos ativos
+                  </span>
+                  <span className="py-3 px-6 font-bold">
+                    {formatNumber(
+                      getSumByKey(
+                        vehicles.filter((v) => v.ativo),
+                        "capacidade"
+                      )
+                    )}
+                    Kg
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -289,7 +373,6 @@ export function Vehicles() {
         >
           <div className="bg-white shadow sm:rounded-lg sm:p-4">
             <div className="md:grid md:grid-cols-4 md:gap-4">
-
               <div className="md:col-span-1">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -448,7 +531,9 @@ export function Vehicles() {
                   title="Adicionar"
                   color="primary"
                   type="button"
-                  disabled={zoneSelected === -1 || vehicleSelected === undefined}
+                  disabled={
+                    zoneSelected === -1 || vehicleSelected === undefined
+                  }
                   loading={isLoading}
                   onClick={() => handleAddZone()}
                 />
@@ -459,24 +544,30 @@ export function Vehicles() {
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                        <th
+                          scope="col"
+                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
                           Nome
                         </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {zones && zones?.length > 0 && zones.map((zone, index) => (
-                        <tr key={zone.id}>
-                          <td
-                            className={classNames(
-                              zoneSelected === zone.id && "bg-slate-400",
-                              "whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6 hover:bg-slate-200 hover:cursor-pointer")}
-                            onClick={() => setZoneSelected(zone.id)}
-                          >
-                            {zone.titulo}
-                          </td>
-                        </tr>
-                      ))}
+                      {zones &&
+                        zones?.length > 0 &&
+                        zones.map((zone, index) => (
+                          <tr key={zone.id}>
+                            <td
+                              className={classNames(
+                                zoneSelected === zone.id && "bg-slate-400",
+                                "whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6 hover:bg-slate-200 hover:cursor-pointer"
+                              )}
+                              onClick={() => setZoneSelected(zone.id)}
+                            >
+                              {zone.titulo}
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -489,10 +580,16 @@ export function Vehicles() {
                   <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                        <th
+                          scope="col"
+                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
                           <span className="sr-only">Prioridade</span>
                         </th>
-                        <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                        <th
+                          scope="col"
+                          className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+                        >
                           Nome
                         </th>
                         <th
@@ -504,48 +601,70 @@ export function Vehicles() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 bg-white">
-                      {vehicleZones && vehicleZones?.length > 0 && vehicleZones.map((zone, index) => (
-                        <tr key={zone.zonaId}>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
-                            {zone.prioridade}
-                          </td>
-                          <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
-                            {zone.zona}
-                          </td>
-                          <td className="whitespace-nowrap py-4 pl-4 sm:pl-6">
-                            <div className="flex flex-row gap-4">
-                              {zone.prioridade > 1 &&
+                      {vehicleZones &&
+                        vehicleZones?.length > 0 &&
+                        vehicleZones.map((zone, index) => (
+                          <tr key={zone.zonaId}>
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                              {zone.prioridade}
+                            </td>
+                            <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                              {zone.zona}
+                            </td>
+                            <td className="whitespace-nowrap py-4 pl-4 sm:pl-6">
+                              <div className="flex flex-row gap-4">
+                                {zone.prioridade > 1 && (
+                                  <a
+                                    className="flex flex-col items-center hover:text-cyan-900 cursor-pointer"
+                                    onClick={() =>
+                                      handleSavePriority(
+                                        zone.zonaId,
+                                        zone.prioridade,
+                                        "UP"
+                                      )
+                                    }
+                                  >
+                                    <ChevronUpIcon
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
+                                    <span className="text-xs">Subir</span>
+                                  </a>
+                                )}
+
+                                {zone.prioridade < vehicleZones.length && (
+                                  <a
+                                    className="flex flex-col items-center hover:text-cyan-900 cursor-pointer"
+                                    onClick={() =>
+                                      handleSavePriority(
+                                        zone.zonaId,
+                                        zone.prioridade,
+                                        "DOWN"
+                                      )
+                                    }
+                                  >
+                                    <ChevronDownIcon
+                                      className="h-5 w-5"
+                                      aria-hidden="true"
+                                    />
+                                    <span className="text-xs">Descer</span>
+                                  </a>
+                                )}
+
                                 <a
-                                  className="flex flex-col items-center hover:text-cyan-900 cursor-pointer"
-                                  onClick={() => handleSavePriority(zone.zonaId, zone.prioridade, "UP")}
+                                  className="flex flex-col items-center text-red-600 hover:text-red-900 cursor-pointer"
+                                  onClick={() => handleRemoveZone(zone.zonaId)}
                                 >
-                                  <ChevronUpIcon className="h-5 w-5" aria-hidden="true" />
-                                  <span className="text-xs">Subir</span>
+                                  <TrashIcon
+                                    className="h-5 w-5"
+                                    aria-hidden="true"
+                                  />
+                                  <span className="text-xs">Remover</span>
                                 </a>
-                              }
-
-                              {zone.prioridade < vehicleZones.length &&
-                                <a
-                                  className="flex flex-col items-center hover:text-cyan-900 cursor-pointer"
-                                  onClick={() => handleSavePriority(zone.zonaId, zone.prioridade, "DOWN")}
-                                >
-                                  <ChevronDownIcon className="h-5 w-5" aria-hidden="true" />
-                                  <span className="text-xs">Descer</span>
-                                </a>
-                              }
-
-
-                              <a
-                                className="flex flex-col items-center text-red-600 hover:text-red-900 cursor-pointer"
-                                onClick={() => handleRemoveZone(zone.zonaId)}
-                              >
-                                <TrashIcon className="h-5 w-5" aria-hidden="true" />
-                                <span className="text-xs">Remover</span>
-                              </a>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -555,5 +674,5 @@ export function Vehicles() {
         </div>
       </div>
     </div>
-  )
+  );
 }

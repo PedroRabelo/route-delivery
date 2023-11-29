@@ -92,8 +92,6 @@ export class PedidosController {
 
   @Post('entregas')
   generateRoutes(@Body() params: PedidoParamsDto) {
-    params.startDate = format(parseISO(params.startDate), 'dd-MM-yyyy');
-
     return this.pedidosService.generateRoutes(params);
   }
 

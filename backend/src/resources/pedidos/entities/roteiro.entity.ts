@@ -24,6 +24,9 @@ export class Roteiro {
   @Column({ name: 'distancia' })
   distancia: number;
 
+  @Column({ name: 'data_inclusao' })
+  dataInclusao: Date;
+
   @OneToMany(() => Pedido, (pedido) => pedido.roteiro)
   pedidos: Pedido[];
 }
