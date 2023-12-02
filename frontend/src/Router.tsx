@@ -1,14 +1,14 @@
-import { Route, Routes } from 'react-router-dom'
-import { DefaultLayout } from './layouts/DefaultLayout'
-import { Clients } from './pages/Clients'
+import { Route, Routes } from "react-router-dom";
+import { DefaultLayout } from "./layouts/DefaultLayout";
+import { Clients } from "./pages/Clients";
 
-import Deliveries from './pages/Deliveries'
-import { CreateDelivery } from './pages/Deliveries/create'
-import { DeliveryLocations } from './pages/Deliveries/locations'
-import { Vehicles } from './pages/Vehicles'
-import Zones from './pages/Zones'
-import { RoutesDelivery } from './pages/Deliveries/routes-delivery'
-
+import Deliveries from "./pages/Deliveries";
+import { CreateDelivery } from "./pages/Deliveries/create";
+import { DeliveryLocations } from "./pages/Deliveries/locations";
+import { Vehicles } from "./pages/Vehicles";
+import Zones from "./pages/Zones";
+import { RoutesDelivery } from "./pages/Deliveries/routes-delivery";
+import { TrackRoutes } from "./pages/TrackRoutes";
 
 export function Router() {
   return (
@@ -22,7 +22,8 @@ export function Router() {
         <Route path="/zonas" element={<Zones />} />
         <Route path="/veiculos" element={<Vehicles />} />
         <Route path="/clientes" element={<Clients />} />
+        <Route path="/rastreamento" element={<TrackRoutes />} />
       </Route>
     </Routes>
-  )
+  );
 }

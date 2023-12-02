@@ -1,17 +1,18 @@
-import { Disclosure } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { Link, useLocation } from 'react-router-dom'
-import { Logo } from '../Logo/Logo'
+import { Disclosure } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Link, useLocation } from "react-router-dom";
+import { Logo } from "../Logo/Logo";
 
 const navigation = [
-  { name: 'Entregas', to: '/' },
-  { name: 'Zonas', to: '/zonas' },
-  { name: 'Veículos', to: '/veiculos' },
-  { name: 'Clientes', to: '/clientes' },
-]
+  { name: "Entregas", to: "/" },
+  { name: "Rastreamento", to: "/rastreamento" },
+  { name: "Zonas", to: "/zonas" },
+  { name: "Veículos", to: "/veiculos" },
+  { name: "Clientes", to: "/clientes" },
+];
 
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
@@ -36,9 +37,9 @@ export default function Navbar() {
               </div>
               <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
                 <div className="flex flex-shrink-0 items-center">
-                  <Logo className='block h-24 pt-8 w-auto lg:hidden' />
+                  <Logo className="block h-24 pt-8 w-auto lg:hidden" />
 
-                  <Logo className='hidden h-24 pt-8 w-auto lg:block' />
+                  <Logo className="hidden h-24 pt-8 w-auto lg:block" />
                 </div>
                 <div className="hidden pt-8 sm:ml-8 sm:block">
                   <div className="flex space-x-4">
@@ -47,10 +48,14 @@ export default function Navbar() {
                         key={item.name}
                         to={item.to}
                         className={classNames(
-                          item.to === location.pathname ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'px-3 py-2 rounded-md text-sm font-medium'
+                          item.to === location.pathname
+                            ? "bg-gray-900 text-white"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                          "px-3 py-2 rounded-md text-sm font-medium"
                         )}
-                        aria-current={item.to === location.pathname ? 'page' : undefined}
+                        aria-current={
+                          item.to === location.pathname ? "page" : undefined
+                        }
                       >
                         {item.name}
                       </Link>
@@ -69,10 +74,14 @@ export default function Navbar() {
                   as="a"
                   href={item.to}
                   className={classNames(
-                    item.to === location.pathname ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                    'block px-3 py-2 rounded-md text-base font-medium'
+                    item.to === location.pathname
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                    "block px-3 py-2 rounded-md text-base font-medium"
                   )}
-                  aria-current={item.to === location.pathname ? 'page' : undefined}
+                  aria-current={
+                    item.to === location.pathname ? "page" : undefined
+                  }
                 >
                   {item.name}
                 </Disclosure.Button>
@@ -82,5 +91,5 @@ export default function Navbar() {
         </>
       )}
     </Disclosure>
-  )
+  );
 }
