@@ -36,8 +36,6 @@ export class PedidosService {
     try {
       let dataFormatada: Date;
 
-      console.log(createPedidoDto[0].entrega instanceof Date);
-
       if (createPedidoDto[0].entrega instanceof Date) {
         dataFormatada = createPedidoDto[0].entrega;
       } else {
@@ -225,7 +223,6 @@ export class PedidosService {
         order: { id: 'DESC' },
       });
 
-      console.log(roteiros);
       return roteiros?.map((res) => ({
         id: res.id,
         data: res.dataEntrega,

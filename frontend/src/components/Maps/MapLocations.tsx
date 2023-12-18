@@ -42,7 +42,7 @@ export function MapLocations({
       disableDefaultUI: true,
       clickableIcons: false,
       fullscreenControl: true,
-      mapTypeId: "satellite",
+      mapTypeId: "roadmap",
       mapTypeControl: true,
       styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
     }),
