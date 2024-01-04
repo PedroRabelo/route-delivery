@@ -58,4 +58,9 @@ export class VeiculosController {
   deleteZona(@Param('veiculoId') veiculoId: string, @Param('id') id: string) {
     return this.veiculosService.removeVeiculoZona(+veiculoId, +id);
   }
+
+  @Delete(':veiculoId/')
+  deleteVeiculo(@Param('veiculoId') veiculoId: string) {
+    return this.veiculosService.deleteVeiculo(+veiculoId);
+  }
 }

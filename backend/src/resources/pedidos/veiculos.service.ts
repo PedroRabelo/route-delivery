@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateVeiculoZonaDto } from '../zonas/dto/create-veiculo-zona.dto';
 import { UpdateVeiculoZonaDto } from '../zonas/dto/update-veiculo-zona.dto';
 import { VeiculoZona } from '../zonas/entities/veiculo-zona.entity';
@@ -45,6 +45,7 @@ export class VeiculosService {
   async getVeiculos() {
     try {
       return await this.veiculoRepository.find({
+        where: { dataExclusao: IsNull() },
         order: { capacidade: { direction: 'DESC' } },
       });
     } catch (error) {
@@ -91,9 +92,9 @@ export class VeiculosService {
     }
   }
 
-  async deleteVeiculo() {
+  async deleteVeiculo(veiculoId: number) {
     try {
-      //this.veiculoRepository.delete()
+      this.veiculoRepository.update(veiculoId, { dataExclusao: new Date() })
     } catch (error) {
       console.log(error);
       throw error;

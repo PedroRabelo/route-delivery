@@ -2,8 +2,7 @@ import {
   MapIcon,
   MapPinIcon,
   QueueListIcon,
-  TableCellsIcon,
-  TruckIcon,
+  TruckIcon
 } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import classNames from "classnames";
@@ -13,7 +12,9 @@ import { useParams } from "react-router-dom";
 import { utils, writeFile } from "xlsx";
 import * as zod from "zod";
 import { Button } from "../../components/Button";
+import DialogModal from "../../components/DialogModal";
 import { FormInput } from "../../components/Form";
+import { Bound } from "../../components/Maps";
 import { api } from "../../lib/axios";
 import {
   DeliveryPoints,
@@ -26,7 +27,6 @@ import { DeliveriesMap } from "./components/DeliveriesMap";
 import { DeliveriesVehicle } from "./components/DeliveriesVehicles";
 import { DeliveriesWithoutVehicle } from "./components/DeliveriesWithoutVehicle";
 import { VehiclesList } from "./components/VehiclesList";
-import { Bound } from "../../components/Maps";
 
 const requiredText = "Campo obrigatório";
 
@@ -60,6 +60,8 @@ export function RoutesDelivery() {
   const [route, setRoute] = useState<DeliveryRoute>();
   const [licensePlate, setLicensePlate] = useState("");
   const [areaRodizioBounds, setAreaRodizioBounds] = useState<Bound[]>([]);
+  const [openClearDialog, setOpenClearDialog] = useState(false);
+  const [openClearPolygonDialog, setOpenClearPolygonDialog] = useState(false);
 
   const newDeliveryForm = useForm<NewDeliveryFormData>({
     resolver: zodResolver(deliveryFormValidationSchema),
@@ -160,6 +162,7 @@ export function RoutesDelivery() {
   }
 
   async function clearRoutes() {
+
     setIsLoading(true);
     await api.post(`/pedidos/limpar-dia`, { startDate: route?.data });
     fetchUpdateDeliveries();
@@ -299,7 +302,7 @@ export function RoutesDelivery() {
                       title="Limpar"
                       color="primary"
                       type="button"
-                      onClick={() => clearRoutes()}
+                      onClick={() => setOpenClearDialog(true)}
                       disabled={isLoading || route?.data === undefined}
                       loading={isLoading}
                     />
@@ -309,7 +312,7 @@ export function RoutesDelivery() {
                       title="Limpar Polígono"
                       color="primary"
                       type="button"
-                      onClick={() => clearPolygon()}
+                      onClick={() => setOpenClearPolygonDialog(true)}
                       disabled={isLoading || route?.data === undefined}
                       loading={isLoading}
                     />
@@ -318,6 +321,20 @@ export function RoutesDelivery() {
               </div>
             </div>
           </form>
+
+          <DialogModal
+            open={openClearPolygonDialog}
+            setOpen={() => setOpenClearPolygonDialog(false)}
+            handleAction={() => clearPolygon()}
+            title="Deseja limpar os dados do polígono?"
+          />
+
+          <DialogModal
+            open={openClearDialog}
+            setOpen={() => setOpenClearDialog(false)}
+            handleAction={() => clearRoutes()}
+            title="Deseja limpar os dados da roteirização?"
+          />
         </div>
       </div>
       <div className="shadow-lg rounded-lg md:flex md:items-center md:justify-around bg-gray-100">

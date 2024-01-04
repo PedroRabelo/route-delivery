@@ -46,4 +46,7 @@ export class Veiculo {
 
   @Column({ name: 'USADO' })
   possuiPedidos: boolean;
+
+  @Column({ name: 'DATA_EXCLUSAO' })
+  dataExclusao: Date;
 }

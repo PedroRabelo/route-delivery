@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as zod from "zod";
 import { Button } from "../../components/Button";
+import DialogModal from "../../components/DialogModal";
 import { FormInput } from "../../components/Form";
 import { Toggle } from "../../components/Toggle/Toggle";
 import { api } from "../../lib/axios";
@@ -42,6 +43,7 @@ export function Vehicles() {
   const [temRodizio, setTemRodizio] = useState(0);
   const [vehicleZones, setVehicleZones] = useState<VehicleZone[]>([]);
   const [zoneSelected, setZoneSelected] = useState<number>(-1);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const newVehicleForm = useForm<NewVehicleFormData>({
     resolver: zodResolver(vehicleFormValidationSchema),
@@ -226,6 +228,21 @@ export function Vehicles() {
     );
   }
 
+  function confirmDeleteVehicle(id: number) {
+    setVehicleSelected(id);
+    setOpenDeleteDialog(true);
+  }
+
+  async function deleteVehicle(id: number) {
+    try {
+      await api.delete(`veiculos/${id}`)
+      setVehicleSelected(undefined)
+      getVehicles();
+    } catch (error: any) {
+      alert(error.message)
+    }
+  }
+
   return (
     <div className="flex gap-2">
       <div className="container">
@@ -289,6 +306,12 @@ export function Vehicles() {
                     >
                       Ativo
                     </th>
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      Remover
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
@@ -338,6 +361,16 @@ export function Vehicles() {
                             }
                           />
                         </td>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                          <a
+                            className="flex flex-col items-center text-red-600 hover:text-red-900 cursor-pointer"
+                            onClick={() => confirmDeleteVehicle(vehicle.id)}
+                          >
+                            <TrashIcon className="h-5 w-5" aria-hidden="true" />
+                            <span className="text-xs">Remover</span>
+                          </a>
+                        </td>
+
                       </tr>
                     ))}
                 </tbody>
@@ -673,6 +706,13 @@ export function Vehicles() {
           </div>
         </div>
       </div>
+
+      <DialogModal
+        open={openDeleteDialog}
+        setOpen={() => setOpenDeleteDialog(false)}
+        handleAction={() => deleteVehicle(vehicleSelected!)}
+        title="Deseja excluir o veículo?"
+      />
     </div>
   );
 }
