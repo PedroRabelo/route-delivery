@@ -8,25 +8,25 @@ import {
   Put,
   Query,
   UploadedFile,
-  UseInterceptors,
+  UseInterceptors
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { format, parseISO } from 'date-fns';
 import { getLatLongFromAddress } from 'src/common/utils/getLatLongFromAddress';
 import { readFile, utils } from 'xlsx';
 import { ChangeVeiculoPedido } from './dto/change-veiculo-pedido.dto';
+import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
+import { LimparParamsDto } from './dto/limpar-params.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
+import { UpdatePedidoVeiculoPoligonoDto } from './dto/update-pedido-veiculo-poligono.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { PedidosService } from './pedidos.service';
-import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
-import { UpdatePedidoVeiculoPoligonoDto } from './dto/update-pedido-veiculo-poligono.dto';
-import { LimparParamsDto } from './dto/limpar-params.dto';
 
 @Controller('pedidos')
 export class PedidosController {
-  constructor(private readonly pedidosService: PedidosService) {}
+  constructor(private readonly pedidosService: PedidosService) { }
 
   @Post('upload-sheet')
   @UseInterceptors(FileInterceptor('file', { dest: '/tmp/' }))
@@ -174,5 +174,18 @@ export class PedidosController {
   clearPolygonByDate(@Body() dto: LimparParamsDto) {
     dto.startDate = format(parseISO(dto.startDate), 'dd-MM-yyyy');
     return this.pedidosService.clearPolygonByDate(dto.startDate);
+  }
+
+  @Get('locais')
+  listPedidosLocais(
+    @Query('id') id: number,
+    @Query('cep') cep: string,
+    @Query('endereco') endereco: string
+  ) {
+    return this.pedidosService.listPedidosLocais({
+      id,
+      cep,
+      endereco
+    })
   }
 }

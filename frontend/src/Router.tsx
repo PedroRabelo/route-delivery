@@ -5,10 +5,11 @@ import { Clients } from "./pages/Clients";
 import Deliveries from "./pages/Deliveries";
 import { CreateDelivery } from "./pages/Deliveries/create";
 import { DeliveryLocations } from "./pages/Deliveries/locations";
+import { RoutesDelivery } from "./pages/Deliveries/routes-delivery";
+import { Locations } from "./pages/Locations";
+import { TrackRoutes } from "./pages/TrackRoutes";
 import { Vehicles } from "./pages/Vehicles";
 import Zones from "./pages/Zones";
-import { RoutesDelivery } from "./pages/Deliveries/routes-delivery";
-import { TrackRoutes } from "./pages/TrackRoutes";
 
 export function Router() {
   return (
@@ -23,6 +24,7 @@ export function Router() {
         <Route path="/veiculos" element={<Vehicles />} />
         <Route path="/clientes" element={<Clients />} />
         <Route path="/rastreamento" element={<TrackRoutes />} />
+        <Route path="/locais" element={<Locations />} />
       </Route>
     </Routes>
   );

@@ -3,18 +3,12 @@ import Navbar from '../../components/Navbar';
 
 export function DefaultLayout() {
   return (
-    <>
-      <div className="h-full w-full">
-        <Navbar />
+    <div className="flex flex-col h-full w-full">
+      <Navbar />
 
-        <main>
-          <div className="">
-            <div className="mx-4 px-4 py-2">
-              <Outlet />
-            </div>
-          </div>
-        </main>
+      <div className="flex flex-1 flex-col px-4 py-2 max-h-full">
+        <Outlet />
       </div>
-    </>
+    </div>
   )
 }

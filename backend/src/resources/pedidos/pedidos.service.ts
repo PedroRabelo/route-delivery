@@ -3,16 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { convertLatLongFloat } from 'src/common/utils/convertLatLongFloat';
 import { slicePedidosIntoChunks } from 'src/common/utils/sliceArrayIntoChunks';
 import { validadeFileData } from 'src/common/utils/validadeFileData';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Like, MoreThan, Repository } from 'typeorm';
 import { ChangeVeiculoPedido } from './dto/change-veiculo-pedido.dto';
 import { CreatePedidoPoligonoDto } from './dto/create-pedido-poligono.dto';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { DeleteRouteVehicleDTO } from './dto/delete-route-vehicle.dto';
+import { LocaisFilter } from './dto/locais-filter.dto';
 import { PedidoParamsDto } from './dto/pedido-params.dto';
 import { UpdatePedidoVeiculoPoligonoDto } from './dto/update-pedido-veiculo-poligono.dto';
 import { UpdateRoteiroDto } from './dto/update-roteiro.dto';
 import { PedidoPoligono } from './entities/pedido-poligono.entity';
 import { Pedido } from './entities/pedido.entity';
+import { PedidoLocal } from './entities/pedidoLocal.entity';
 import { PedidosRoterizados } from './entities/pedidos-roterizados.entity';
 import { Roteiro } from './entities/roteiro.entity';
 import { Veiculo } from './entities/veiculo.entity';
@@ -30,7 +32,9 @@ export class PedidosService {
     private pedidoPoligonoRepository: Repository<PedidoPoligono>,
     @InjectRepository(PedidosRoterizados)
     private pedidoRoterizadoRepository: Repository<PedidosRoterizados>,
-  ) {}
+    @InjectRepository(PedidoLocal)
+    private pedidoLocaisRepository: Repository<PedidoLocal>
+  ) { }
 
   async create(createPedidoDto: CreatePedidoDto[]) {
     try {
@@ -452,12 +456,12 @@ export class PedidosService {
   }
 
   async saveDeliveriesPolygon(dto: UpdatePedidoVeiculoPoligonoDto) {
-    const ordem = await this.pedidoRepository.query(
-      `
-      select max(ISNULL(v.ORD_CAR , 0) + 1) ordem from VEICULOS v inner join PEDIDOS p on v.ID  = p.ID_VEICULO where p.roteiroId = @0
-      `,
-      [dto.roteiroId],
-    );
+    // const ordem = await this.pedidoRepository.query(
+    //   `
+    //   select max(ISNULL(v.ORD_CAR , 0) + 1) ordem from VEICULOS v inner join PEDIDOS p on v.ID  = p.ID_VEICULO where p.roteiroId = @0
+    //   `,
+    //   [dto.roteiroId],
+    // );
 
     dto.pedidos.map(async (d) => {
       await this.pedidoRepository.update(d, {
@@ -510,5 +514,32 @@ export class PedidosService {
       `,
       [routeDate],
     );
+  }
+
+  async listPedidosLocais(filters: LocaisFilter) {
+    const where: FindOptionsWhere<PedidoLocal>[] = [];
+
+    if (filters.id !== undefined && !Number.isNaN(filters.id)) {
+      where.push({ id: filters.id })
+    }
+
+    if (filters.cep !== undefined) {
+      where.push({ cep: filters.cep })
+    }
+
+    if (filters.endereco !== undefined) {
+      where.push({ endereco: Like(`%${filters.endereco}%`) })
+    }
+
+    if (where.length === 0) {
+      where.push({ id: MoreThan(0) })
+    }
+
+    return await this.pedidoLocaisRepository.find({
+      where,
+      order: {
+        id: 'ASC'
+      }
+    })
   }
 }
