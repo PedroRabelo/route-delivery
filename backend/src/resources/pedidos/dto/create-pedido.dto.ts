@@ -45,4 +45,7 @@ export class CreatePedidoDto {
 
   @IsNumber()
   bruto: number;
+
+  @IsString()
+  tipoServico: string;
 }

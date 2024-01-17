@@ -53,7 +53,7 @@ export class PedidosController {
 
     const keys = Object.keys(json[0]);
 
-    if (keys.length !== 15) {
+    if (keys.length !== 16) {
       throw new Error('Arquivo fora do padrão de colunas');
     }
 
@@ -74,6 +74,7 @@ export class PedidosController {
         longitude: obj[keys[12]],
         total: obj[keys[13]],
         bruto: obj[keys[14]],
+        tipoServico: obj[keys[15]],
       };
     });
 

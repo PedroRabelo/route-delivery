@@ -63,6 +63,9 @@ export class Pedido {
   @Column({ name: 'ORDEM' })
   ordem: number;
 
+  @Column({ name: 'tipo_servico' })
+  tipoServico: string;
+
   constructor(partial: Partial<Pedido>) {
     Object.assign(this, partial);
   }
