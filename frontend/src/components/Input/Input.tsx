@@ -5,7 +5,7 @@ import {
   forwardRef, InputHTMLAttributes
 } from "react";
 
-export type InputSize = "medium" | "large";
+export type InputSize = "small" | "medium" | "large";
 export type InputType = "text" | "email" | "number";
 
 export type InputProps = {
@@ -24,6 +24,7 @@ export type InputProps = {
 // see https://tailwindcss.com/docs/optimizing-for-production#writing-purgeable-html
 
 const sizeMap: { [key in InputSize]: string } = {
+  small: "p-2 text-sm",
   medium: "p-3 text-base",
   large: "p-4 text-base",
 };

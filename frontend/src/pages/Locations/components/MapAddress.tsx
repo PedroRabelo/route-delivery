@@ -3,7 +3,7 @@ import {
   Marker,
   MarkerClusterer
 } from "@react-google-maps/api";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { Location } from "../../../services/types/Location";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
@@ -29,12 +29,6 @@ export function MapAddress({ locations }: MapProps) {
       styles: [{ featureType: "poi", stylers: [{ visibility: "off" }] }],
     }),
     []
-  );
-
-  const [infoWindowPos, setInfoWindowPos] = useState<LatLngLiteral>();
-  const [renderInfoWindow, setRenderInfowWindow] = useState(false);
-  const [infoWindowData, setInfoWindowData] = useState<Location>(
-    {} as Location
   );
 
   const onLoad = useCallback((map: any) => {

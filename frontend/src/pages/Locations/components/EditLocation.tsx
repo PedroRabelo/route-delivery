@@ -2,6 +2,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { LinkIcon, PlusIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Fragment } from 'react'
+import { Location } from '../../../services/types/Location'
 
 const team = [
   {
@@ -44,10 +45,11 @@ const team = [
 type Props = {
   handleCloseLocation: () => void;
   openLocation: boolean;
+  location: Location
 }
 
+export function EditLocation({ handleCloseLocation, openLocation, location }: Props) {
 
-export function EditLocation({ handleCloseLocation, openLocation }: Props) {
   return (
     <Transition.Root show={openLocation} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={() => handleCloseLocation()}>
