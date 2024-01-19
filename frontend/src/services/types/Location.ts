@@ -19,3 +19,16 @@ export type Location = {
   observacao: string;
   restritivoHorario: boolean;
 }
+
+export type UpdateLocationDto = {
+  nome: string;
+  verificarLocal: boolean;
+  tempoEstimadoEntrega: string;
+  tempoEstimadoCarga: string;
+  latLongManual: boolean;
+  clientesLocal: number;
+  enderecoColetivo: boolean;
+  zonaRisco: boolean
+  observacao: string;
+  restritivoHorario: boolean
+}

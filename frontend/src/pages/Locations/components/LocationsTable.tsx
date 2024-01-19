@@ -125,7 +125,7 @@ export function LocationsTable({ locations, handleEditLocation }: Props) {
                   {location.endereco}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {location.verificarLocal}
+                  {location.verificarLocal ? 'Sim' : 'Não'}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                   {location.tempoEstimadoEntrega}
@@ -134,16 +134,16 @@ export function LocationsTable({ locations, handleEditLocation }: Props) {
                   {location.tempoEstimadoCarga}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {location.latLongManual}
+                  {location.latLongManual ? 'Sim' : 'Não'}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                   {location.clientesLocal}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {location.enderecoColetivo}
+                  {location.enderecoColetivo ? 'Sim' : 'Não'}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {location.zonaRisco}
+                  {location.zonaRisco ? 'Sim' : 'Não'}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                   {location.nome}
@@ -152,7 +152,7 @@ export function LocationsTable({ locations, handleEditLocation }: Props) {
                   {location.observacao}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {location.restritivoHorario}
+                  {location.restritivoHorario ? 'Sim' : 'Não'}
                 </td>
               </tr>
             ))}

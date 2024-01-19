@@ -1,54 +1,105 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { LinkIcon, PlusIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { Fragment } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Fragment, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import * as zod from 'zod'
+import { Button } from '../../../components/Button'
+import { FormInput } from '../../../components/Form'
+import { TextAreaInput } from '../../../components/Form/FormTextarea'
+import { api } from '../../../lib/axios'
 import { Location } from '../../../services/types/Location'
-
-const team = [
-  {
-    name: 'Tom Cook',
-    email: 'tom.cook@example.com',
-    href: '#',
-    imageUrl:
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    name: 'Whitney Francis',
-    email: 'whitney.francis@example.com',
-    href: '#',
-    imageUrl:
-      'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    name: 'Leonard Krasner',
-    email: 'leonard.krasner@example.com',
-    href: '#',
-    imageUrl:
-      'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    name: 'Floyd Miles',
-    email: 'floyd.miles@example.com',
-    href: '#',
-    imageUrl:
-      'https://images.unsplash.com/photo-1463453091185-61582044d556?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    name: 'Emily Selman',
-    email: 'emily.selman@example.com',
-    href: '#',
-    imageUrl:
-      'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-]
 
 type Props = {
   handleCloseLocation: () => void;
   openLocation: boolean;
-  location: Location
+  location: Location;
+  //updatedLocation: (location: Location) => void;
 }
 
+const locationFormValidationSchema = zod.object({
+  nome: zod.string(),
+  verificarLocal: zod.boolean(),
+  tempoEstimadoEntrega: zod.string(),
+  tempoEstimadoCarga: zod.string(),
+  latLongManual: zod.boolean(),
+  clientesLocal: zod.string(),
+  enderecoColetivo: zod.boolean(),
+  zonaRisco: zod.boolean(),
+  observacao: zod.string(),
+  restritivoHorario: zod.boolean(),
+});
+
+type EditLocationFormData = zod.infer<typeof locationFormValidationSchema>
+
+
 export function EditLocation({ handleCloseLocation, openLocation, location }: Props) {
+  const {
+    bairro,
+    cep,
+    cidade,
+    clientesLocal,
+    endereco,
+    enderecoColetivo,
+    estado,
+    id,
+    latLongManual,
+    latitude,
+    longitude,
+    nome,
+    numero,
+    observacao,
+    restritivoHorario,
+    tempoEstimadoCarga,
+    tempoEstimadoEntrega,
+    verificarLocal,
+    zonaRisco
+  } = location
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [temVerificaLocal, setTemVerificaLocal] = useState(verificarLocal ? 1 : 0);
+  const [temLatLongManual, setTemLatLongManual] = useState(latLongManual ? 1 : 0);
+  const [temEndColetivo, setTemEndColetivo] = useState(enderecoColetivo ? 1 : 0);
+  const [temZonaRisco, setTemZonaRisco] = useState(zonaRisco ? 1 : 0);
+  const [temRestricao, setTemRestricao] = useState(restritivoHorario ? 1 : 0);
+
+  const editLocationForm = useForm<EditLocationFormData>({
+    resolver: zodResolver(locationFormValidationSchema),
+    defaultValues: {
+      nome,
+      verificarLocal,
+      tempoEstimadoEntrega,
+      tempoEstimadoCarga,
+      latLongManual,
+      clientesLocal: clientesLocal.toString(),
+      enderecoColetivo,
+      zonaRisco,
+      observacao,
+      restritivoHorario
+    }
+  })
+
+  const { formState: { errors }, handleSubmit, register, reset } = editLocationForm
+
+  const onSubmit: SubmitHandler<EditLocationFormData> = async (data) => {
+    try {
+      setIsLoading(true);
+
+      await api.patch(`pedidos-locais/${id}`, data)
+
+      reset()
+      setIsLoading(false)
+      handleCloseLocation()
+
+    } catch (e: any) {
+      setIsLoading(false);
+      console.log(e);
+      alert(e.response.data.message);
+    }
+  }
+
+  const enderecoCompleto = `${endereco}, ${numero} ${bairro} - ${cidade}-${estado}`
 
   return (
     <Transition.Root show={openLocation} as={Fragment}>
@@ -68,12 +119,16 @@ export function EditLocation({ handleCloseLocation, openLocation, location }: Pr
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                  <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                  <form
+                    className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
+                    autoComplete="off"
+                    onSubmit={handleSubmit(onSubmit)}
+                  >
                     <div className="h-0 flex-1 overflow-y-auto">
                       <div className="bg-indigo-700 px-4 py-6 sm:px-6">
                         <div className="flex items-center justify-between">
                           <Dialog.Title className="text-base font-semibold leading-6 text-white">
-                            New Project
+                            Editar Local
                           </Dialog.Title>
                           <div className="ml-3 flex h-7 items-center">
                             <button
@@ -89,7 +144,10 @@ export function EditLocation({ handleCloseLocation, openLocation, location }: Pr
                         </div>
                         <div className="mt-1">
                           <p className="text-sm text-indigo-300">
-                            Get started by filling in the information below to create your new project.
+                            {location.id} - CEP: {location.cep}
+                          </p>
+                          <p className="text-sm text-indigo-300">
+                            {enderecoCompleto}
                           </p>
                         </div>
                       </div>
@@ -98,106 +156,127 @@ export function EditLocation({ handleCloseLocation, openLocation, location }: Pr
                           <div className="space-y-6 pb-5 pt-6">
                             <div>
                               <label
-                                htmlFor="project-name"
+                                htmlFor="nome"
                                 className="block text-sm font-medium leading-6 text-gray-900"
                               >
-                                Project name
+                                Nome
                               </label>
-                              <div className="mt-2">
-                                <input
+                              <div className="mt-1">
+                                <FormInput<EditLocationFormData>
+                                  id="nome"
                                   type="text"
-                                  name="project-name"
-                                  id="project-name"
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                  name="nome"
+                                  label="Nome"
+                                  className="mb-2"
+                                  register={register}
+                                  errors={errors}
+                                  size='small'
                                 />
                               </div>
                             </div>
-                            <div>
-                              <label
-                                htmlFor="description"
-                                className="block text-sm font-medium leading-6 text-gray-900"
-                              >
-                                Description
-                              </label>
-                              <div className="mt-2">
-                                <textarea
-                                  id="description"
-                                  name="description"
-                                  rows={4}
-                                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                                  defaultValue={''}
-                                />
+
+                            <div className='flex justify-between gap-2'>
+                              <div>
+                                <label
+                                  htmlFor="tempoEstimadoEntrega"
+                                  className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                  Tempo Est. Entrega
+                                </label>
+                                <div className="mt-1">
+                                  <FormInput<EditLocationFormData>
+                                    id="tempoEstimadoEntrega"
+                                    type="text"
+                                    name="tempoEstimadoEntrega"
+                                    label="Tempo Est. Entrega"
+                                    className="mb-2"
+                                    register={register}
+                                    errors={errors}
+                                    size='small'
+                                  />
+                                </div>
                               </div>
-                            </div>
-                            <div>
-                              <h3 className="text-sm font-medium leading-6 text-gray-900">Team Members</h3>
-                              <div className="mt-2">
-                                <div className="flex space-x-2">
-                                  {team.map((person) => (
-                                    <a
-                                      key={person.email}
-                                      href={person.href}
-                                      className="relative rounded-full hover:opacity-75"
-                                    >
-                                      <img
-                                        className="inline-block h-8 w-8 rounded-full"
-                                        src={person.imageUrl}
-                                        alt={person.name}
-                                      />
-                                    </a>
-                                  ))}
-                                  <button
-                                    type="button"
-                                    className="relative inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2 border-dashed border-gray-200 bg-white text-gray-400 hover:border-gray-300 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                  >
-                                    <span className="absolute -inset-2" />
-                                    <span className="sr-only">Add team member</span>
-                                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                                  </button>
+
+                              <div>
+                                <label
+                                  htmlFor="tempoEstimadoCarga"
+                                  className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                  Tempo Est. Carga
+                                </label>
+                                <div className="mt-1">
+                                  <FormInput<EditLocationFormData>
+                                    id="tempoEstimadoCarga"
+                                    type="text"
+                                    name="tempoEstimadoCarga"
+                                    label="Tempo Est. Carga"
+                                    className="mb-2"
+                                    register={register}
+                                    errors={errors}
+                                    size='small'
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label
+                                  htmlFor="clientesLocal"
+                                  className="block text-sm font-medium leading-6 text-gray-900"
+                                >
+                                  Clientes no local
+                                </label>
+                                <div className="mt-1">
+                                  <FormInput<EditLocationFormData>
+                                    id="clientesLocal"
+                                    type="number"
+                                    name="clientesLocal"
+                                    label="Clientes no local"
+                                    className="mb-2"
+                                    register={register}
+                                    errors={errors}
+                                    size='small'
+                                  />
                                 </div>
                               </div>
                             </div>
+
                             <fieldset>
-                              <legend className="text-sm font-medium leading-6 text-gray-900">Privacy</legend>
-                              <div className="mt-2 space-y-4">
+                              <div className="space-y-3">
                                 <div className="relative flex items-start">
                                   <div className="absolute flex h-6 items-center">
                                     <input
-                                      id="privacy-public"
-                                      name="privacy"
-                                      aria-describedby="privacy-public-description"
-                                      type="radio"
-                                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                      defaultChecked
+                                      id="verificarLocal"
+                                      name="verificarLocal"
+                                      type="checkbox"
+                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                      value={temVerificaLocal}
+                                      checked={temVerificaLocal === 1 ? true : false}
+                                      onChange={() => setTemVerificaLocal(temVerificaLocal === 1 ? 0 : 1)}
                                     />
                                   </div>
                                   <div className="pl-7 text-sm leading-6">
                                     <label htmlFor="privacy-public" className="font-medium text-gray-900">
-                                      Public access
+                                      Verificar local
                                     </label>
-                                    <p id="privacy-public-description" className="text-gray-500">
-                                      Everyone with the link will see this project.
-                                    </p>
                                   </div>
                                 </div>
                                 <div>
                                   <div className="relative flex items-start">
                                     <div className="absolute flex h-6 items-center">
                                       <input
-                                        id="privacy-private-to-project"
-                                        name="privacy"
-                                        aria-describedby="privacy-private-to-project-description"
-                                        type="radio"
-                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        id="latLongManual"
+                                        name="latLongManual"
+                                        type="checkbox"
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        value={temLatLongManual}
+                                        checked={temLatLongManual === 1 ? true : false}
+                                        onChange={() => setTemLatLongManual(temLatLongManual === 1 ? 0 : 1)}
                                       />
                                     </div>
                                     <div className="pl-7 text-sm leading-6">
                                       <label htmlFor="privacy-private-to-project" className="font-medium text-gray-900">
-                                        Private to project members
+                                        Latitude/Longitude Manual
                                       </label>
-                                      <p id="privacy-private-to-project-description" className="text-gray-500">
-                                        Only members of this project would be able to access.
-                                      </p>
                                     </div>
                                   </div>
                                 </div>
@@ -205,66 +284,95 @@ export function EditLocation({ handleCloseLocation, openLocation, location }: Pr
                                   <div className="relative flex items-start">
                                     <div className="absolute flex h-6 items-center">
                                       <input
-                                        id="privacy-private"
-                                        name="privacy"
-                                        aria-describedby="privacy-private-to-project-description"
-                                        type="radio"
-                                        className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                        id="enderecoColetivo"
+                                        name="enderecoColetivo"
+                                        type="checkbox"
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        value={temEndColetivo}
+                                        checked={temEndColetivo === 1 ? true : false}
+                                        onChange={() => setTemEndColetivo(temEndColetivo === 1 ? 0 : 1)}
                                       />
                                     </div>
                                     <div className="pl-7 text-sm leading-6">
                                       <label htmlFor="privacy-private" className="font-medium text-gray-900">
-                                        Private to you
+                                        Endereço coletivo
                                       </label>
-                                      <p id="privacy-private-description" className="text-gray-500">
-                                        You are the only one able to access this project.
-                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="relative flex items-start">
+                                    <div className="absolute flex h-6 items-center">
+                                      <input
+                                        id="zonaRisco"
+                                        name="zonaRisco"
+                                        type="checkbox"
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        value={temZonaRisco}
+                                        checked={temZonaRisco === 1 ? true : false}
+                                        onChange={() => setTemZonaRisco(temZonaRisco === 1 ? 0 : 1)}
+                                      />
+                                    </div>
+                                    <div className="pl-7 text-sm leading-6">
+                                      <label htmlFor="privacy-private" className="font-medium text-gray-900">
+                                        Zona de risco
+                                      </label>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="relative flex items-start">
+                                    <div className="absolute flex h-6 items-center">
+                                      <input
+                                        id="restritivoHorario"
+                                        name="restritivoHorario"
+                                        type="checkbox"
+                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                        value={temRestricao}
+                                        checked={temRestricao === 1 ? true : false}
+                                        onChange={() => setTemRestricao(temRestricao === 1 ? 0 : 1)}
+                                      />
+                                    </div>
+                                    <div className="pl-7 text-sm leading-6">
+                                      <label htmlFor="privacy-private" className="font-medium text-gray-900">
+                                        Restrição de horário
+                                      </label>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </fieldset>
-                          </div>
-                          <div className="pb-6 pt-4">
-                            <div className="flex text-sm">
-                              <a
-                                href="#"
-                                className="group inline-flex items-center font-medium text-indigo-600 hover:text-indigo-900"
+
+                            <div>
+                              <label
+                                htmlFor="description"
+                                className="block text-sm font-medium leading-6 text-gray-900"
                               >
-                                <LinkIcon
-                                  className="h-5 w-5 text-indigo-500 group-hover:text-indigo-900"
-                                  aria-hidden="true"
+                                Observação
+                              </label>
+                              <div className="mt-1">
+                                <TextAreaInput<EditLocationFormData>
+                                  id="observacao"
+                                  name="observacao"
+                                  className="mb-2"
+                                  register={register}
+                                  errors={errors}
                                 />
-                                <span className="ml-2">Copy link</span>
-                              </a>
+                              </div>
                             </div>
-                            <div className="mt-4 flex text-sm">
-                              <a href="#" className="group inline-flex items-center text-gray-500 hover:text-gray-900">
-                                <QuestionMarkCircleIcon
-                                  className="h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                  aria-hidden="true"
-                                />
-                                <span className="ml-2">Learn more about sharing</span>
-                              </a>
-                            </div>
+
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-shrink-0 justify-end px-4 py-4">
-                      <button
-                        type="button"
-                        className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        onClick={() => handleCloseLocation()}
-                      >
-                        Cancel
-                      </button>
-                      <button
+                      <Button
+                        title="Editar"
+                        color="primary"
                         type="submit"
-                        className="ml-4 inline-flex justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                      >
-                        Save
-                      </button>
+                        disabled={isLoading}
+                        loading={isLoading}
+                      />
                     </div>
                   </form>
                 </Dialog.Panel>

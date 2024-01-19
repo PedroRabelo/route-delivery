@@ -8,6 +8,8 @@ import { PedidoLocal } from './entities/pedidoLocal.entity';
 import { PedidosRoterizados } from './entities/pedidos-roterizados.entity';
 import { Roteiro } from './entities/roteiro.entity';
 import { Veiculo } from './entities/veiculo.entity';
+import { PedidosLocaisController } from './pedidos-locais.controller';
+import { PedidosLocaisService } from './pedidos-locais.service';
 import { PedidosController } from './pedidos.controller';
 import { PedidosService } from './pedidos.service';
 import { RastreamentoController } from './rastreamento.controller';
@@ -28,7 +30,7 @@ import { VeiculosService } from './veiculos.service';
       PedidoLocal
     ]),
   ],
-  controllers: [PedidosController, VeiculosController, RastreamentoController],
-  providers: [PedidosService, VeiculosService, RastreamentoService],
+  controllers: [PedidosController, VeiculosController, RastreamentoController, PedidosLocaisController],
+  providers: [PedidosService, VeiculosService, RastreamentoService, PedidosLocaisService],
 })
 export class PedidosModule { }

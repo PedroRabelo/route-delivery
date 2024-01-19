@@ -176,17 +176,4 @@ export class PedidosController {
     dto.startDate = format(parseISO(dto.startDate), 'dd-MM-yyyy');
     return this.pedidosService.clearPolygonByDate(dto.startDate);
   }
-
-  @Get('locais')
-  listPedidosLocais(
-    @Query('id') id: number,
-    @Query('cep') cep: string,
-    @Query('endereco') endereco: string
-  ) {
-    return this.pedidosService.listPedidosLocais({
-      id,
-      cep,
-      endereco
-    })
-  }
 }

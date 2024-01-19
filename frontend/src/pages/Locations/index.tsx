@@ -8,6 +8,12 @@ import { EditLocation } from "./components/EditLocation";
 import { LocationsTable } from "./components/LocationsTable";
 import { MapAddress } from "./components/MapAddress";
 
+/* TODO
+ - Formulário de editar
+ - Botão filtrar
+*/
+
+
 export function Locations() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY
@@ -18,7 +24,7 @@ export function Locations() {
   const [locationSelected, setLocationSelected] = useState<Location | null>(null);
 
   async function fetchLocations() {
-    const response = await api.get(`/pedidos/locais`);
+    const response = await api.get(`/pedidos-locais`);
 
     setLocations(response.data)
   }
