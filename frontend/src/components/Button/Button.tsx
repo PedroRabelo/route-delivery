@@ -25,7 +25,7 @@ export function Button({ Icon, title, color, loading, type, ...rest }: Props) {
       )}
       {...rest}
     >
-      {loading && <MoonLoader color="#164e63" size={18} className="-ml-1 mr-2 h-5 w-5" />}
+      {loading && <MoonLoader color="#fff" size={18} className="-ml-1 mr-2 h-5 w-5" />}
 
       {Icon && (
         <Icon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />

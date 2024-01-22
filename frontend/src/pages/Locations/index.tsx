@@ -1,5 +1,5 @@
 import { useLoadScript } from "@react-google-maps/api";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { api } from "../../lib/axios";
@@ -8,20 +8,25 @@ import { EditLocation } from "./components/EditLocation";
 import { LocationsTable } from "./components/LocationsTable";
 import { MapAddress } from "./components/MapAddress";
 
-/* TODO
- - Formulário de editar
- - Botão filtrar
-*/
-
+type Filters = {
+  id?: string;
+  cep?: string;
+  address?: string
+}
 
 export function Locations() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY
   });
 
+  const inputIdRef = useRef<HTMLInputElement>(null);
+  const inputCepRef = useRef<HTMLInputElement>(null);
+  const inputAddressRef = useRef<HTMLInputElement>(null);
+
   const [openLocation, setOpenLocation] = useState(false)
   const [locations, setLocations] = useState<Location[]>([])
   const [locationSelected, setLocationSelected] = useState<Location | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchLocations() {
     const response = await api.get(`/pedidos-locais`);
@@ -34,9 +39,25 @@ export function Locations() {
     setLocationSelected(location)
   }
 
-  useEffect(() => {
-    fetchLocations();
-  }, [])
+  // useEffect(() => {
+  //   fetchLocations();
+  // }, [])
+
+  async function filterLocations() {
+    setIsLoading(true)
+
+    const response = await api.get("/pedidos-locais", {
+      params: {
+        id: inputIdRef?.current?.value,
+        cep: inputCepRef?.current?.value,
+        endereco: inputAddressRef?.current?.value
+      }
+    })
+
+    setLocations(response.data)
+
+    setIsLoading(false)
+  }
 
   if (locations.length === 0 && !isLoaded) {
     return (
@@ -61,6 +82,7 @@ export function Locations() {
           <div className="flex items-center gap-1 md:col-span-1">
             <label className="text-sm font-medium text-gray-700 mb-1">ID:</label>
             <Input
+              ref={inputIdRef}
               id="id"
               label="ID"
               name="id"
@@ -71,6 +93,7 @@ export function Locations() {
           <div className="flex items-center gap-1 md:col-span-2">
             <label className="text-sm font-medium text-gray-700 mb-1">CEP:</label>
             <Input
+              ref={inputCepRef}
               id="cep"
               label="CEP"
               name="cep"
@@ -81,6 +104,7 @@ export function Locations() {
           <div className="flex items-center gap-1 md:col-span-2">
             <label className="text-sm font-medium text-gray-700 mb-1">Endereço:</label>
             <Input
+              ref={inputAddressRef}
               id="address"
               label="address"
               name="address"
@@ -93,7 +117,8 @@ export function Locations() {
               title="Filtrar"
               color="primary"
               type="button"
-
+              onClick={() => filterLocations()}
+              loading={isLoading}
             />
           </div>
         </div>
@@ -111,6 +136,7 @@ export function Locations() {
           openLocation={openLocation}
           handleCloseLocation={() => setOpenLocation(false)}
           location={locationSelected}
+          fetchLocations={() => fetchLocations()}
         />
       }
 

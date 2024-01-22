@@ -15,15 +15,17 @@ export class PedidosLocaisService {
   async listPedidosLocais(filters: LocaisFilter) {
     const where: FindOptionsWhere<PedidoLocal>[] = [];
 
+    console.log(filters)
+
     if (filters.id !== undefined && !Number.isNaN(filters.id)) {
       where.push({ id: filters.id })
     }
 
-    if (filters.cep !== undefined) {
+    if (filters.cep !== undefined && filters.cep !== '') {
       where.push({ cep: filters.cep })
     }
 
-    if (filters.endereco !== undefined) {
+    if (filters.endereco !== undefined && filters.endereco !== '') {
       where.push({ endereco: Like(`%${filters.endereco}%`) })
     }
 

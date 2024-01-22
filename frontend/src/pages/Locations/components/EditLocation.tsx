@@ -14,7 +14,7 @@ type Props = {
   handleCloseLocation: () => void;
   openLocation: boolean;
   location: Location;
-  //updatedLocation: (location: Location) => void;
+  fetchLocations: () => void;
 }
 
 const locationFormValidationSchema = zod.object({
@@ -33,7 +33,7 @@ const locationFormValidationSchema = zod.object({
 type EditLocationFormData = zod.infer<typeof locationFormValidationSchema>
 
 
-export function EditLocation({ handleCloseLocation, openLocation, location }: Props) {
+export function EditLocation({ handleCloseLocation, openLocation, location, fetchLocations }: Props) {
   const {
     bairro,
     cep,
@@ -72,7 +72,7 @@ export function EditLocation({ handleCloseLocation, openLocation, location }: Pr
       tempoEstimadoEntrega,
       tempoEstimadoCarga,
       latLongManual,
-      clientesLocal: clientesLocal.toString(),
+      clientesLocal: clientesLocal?.toString(),
       enderecoColetivo,
       zonaRisco,
       observacao,
@@ -86,12 +86,19 @@ export function EditLocation({ handleCloseLocation, openLocation, location }: Pr
     try {
       setIsLoading(true);
 
-      await api.patch(`pedidos-locais/${id}`, data)
+      await api.patch(`pedidos-locais/${id}`, {
+        ...data,
+        verificarLocal: temVerificaLocal === 1 ? true : false,
+        latLongManual: temLatLongManual === 1 ? true : false,
+        enderecoColetivo: temEndColetivo === 1 ? true : false,
+        zonaRisco: temZonaRisco === 1 ? true : false,
+        restritivoHorario: temRestricao === 1 ? true : false,
+      })
 
       reset()
       setIsLoading(false)
       handleCloseLocation()
-
+      fetchLocations()
     } catch (e: any) {
       setIsLoading(false);
       console.log(e);
