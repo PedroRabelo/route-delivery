@@ -28,12 +28,6 @@ export function Locations() {
   const [locationSelected, setLocationSelected] = useState<Location | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  async function fetchLocations() {
-    const response = await api.get(`/pedidos-locais`);
-
-    setLocations(response.data)
-  }
-
   function editLocation(location: Location) {
     setOpenLocation(true);
     setLocationSelected(location)
@@ -68,6 +62,7 @@ export function Locations() {
       <div className="h-[40vh]">
         <MapAddress
           locations={locations}
+          fetchLocations={() => filterLocations()}
         />
       </div>
 
@@ -132,7 +127,7 @@ export function Locations() {
           openLocation={openLocation}
           handleCloseLocation={() => setOpenLocation(false)}
           location={locationSelected}
-          fetchLocations={() => fetchLocations()}
+          fetchLocations={() => filterLocations()}
         />
       }
 

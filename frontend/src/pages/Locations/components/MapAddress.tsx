@@ -12,9 +12,10 @@ type MapOptions = google.maps.MapOptions;
 
 interface MapProps {
   locations: Location[] | undefined;
+  fetchLocations: () => void;
 }
 
-export function MapAddress({ locations }: MapProps) {
+export function MapAddress({ locations, fetchLocations }: MapProps) {
   const mapRef = useRef<GoogleMap>();
   const center = useMemo<LatLngLiteral>(
     () => ({ lat: -23.5298971, lng: -46.749152 }),
@@ -49,6 +50,7 @@ export function MapAddress({ locations }: MapProps) {
         latitude: bounds.lat(),
         longitude: bounds.lng()
       })
+      fetchLocations()
       alert("Coordenadas alterada com sucesso")
     }
   }
