@@ -3,7 +3,8 @@ import {
   Marker,
   MarkerClusterer
 } from "@react-google-maps/api";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { api } from "../../../lib/axios";
 import { Location } from "../../../services/types/Location";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
@@ -31,16 +32,25 @@ export function MapAddress({ locations }: MapProps) {
     []
   );
 
+  const [locationSelected, setLocationSelected] = useState<Location>();
+
   const onLoad = useCallback((map: any) => {
     mapRef.current = map;
   }, []);
 
   function filterLocation(location: Location) {
-    console.log(location)
+    setLocationSelected(location)
   }
 
-  function handleChangeBounds(bounds: google.maps.LatLng) {
-    console.log(bounds.toJSON())
+  async function handleChangeBounds(bounds: google.maps.LatLng) {
+    if (locationSelected) {
+      await api.patch(`pedidos-locais/${locationSelected.id}`, {
+        latLongManual: true,
+        latitude: bounds.lat(),
+        longitude: bounds.lng()
+      })
+      alert("Coordenadas alterada com sucesso")
+    }
   }
 
   return (
@@ -58,7 +68,7 @@ export function MapAddress({ locations }: MapProps) {
               locations?.map((point) => (
                 <Marker
                   key={point.id}
-                  draggable={true}
+                  draggable={locationSelected !== undefined}
                   onDragEnd={(ev) => handleChangeBounds(ev.latLng!)}
                   position={
                     {
@@ -69,8 +79,19 @@ export function MapAddress({ locations }: MapProps) {
                   clusterer={clusterer}
                   label={{
                     text: `${point.id}`, // codepoint from https://fonts.google.com/icons
-                    color: "#ffffff",
-                    fontSize: "11px",
+                    color: "#000",
+                    fontSize: "12px",
+                    fontWeight: "bold"
+                  }}
+
+                  icon={{
+                    path: "M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 294q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 106Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Zm0-480Z",
+                    fillColor: `${locationSelected !== undefined && point.id === locationSelected.id ? '#27DF67' : '#E61C1C'}`,
+                    fillOpacity: 1,
+                    anchor: new google.maps.Point(0, 20),
+                    strokeWeight: 1,
+                    strokeColor: `${locationSelected !== undefined && point.id === locationSelected.id ? '#27DF67' : '#E61C1C'}`,
+                    scale: 0.04,
                   }}
                   onClick={() => filterLocation(point)}
                 />

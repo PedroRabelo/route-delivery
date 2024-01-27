@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsWhere, Like, MoreThan, Repository } from "typeorm";
 import { LocaisFilter } from "./dto/locais-filter.dto";
 import { UpdateLocalDto } from "./dto/update-local";
-import { PedidoLocal } from "./entities/pedidoLocal.entity";
+import { PedidoLocal } from "./entities/pedido-local.entity";
 
 @Injectable()
 export class PedidosLocaisService {

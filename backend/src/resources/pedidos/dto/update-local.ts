@@ -41,4 +41,12 @@ export class UpdateLocalDto {
   @IsOptional()
   @IsBoolean()
   restritivoHorario: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  latitude: number;
+
+  @IsOptional()
+  @IsNumber()
+  longitude: number;
 }

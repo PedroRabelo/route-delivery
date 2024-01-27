@@ -39,10 +39,6 @@ export function Locations() {
     setLocationSelected(location)
   }
 
-  // useEffect(() => {
-  //   fetchLocations();
-  // }, [])
-
   async function filterLocations() {
     setIsLoading(true)
 

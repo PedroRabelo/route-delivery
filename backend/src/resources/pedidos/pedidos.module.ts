@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VeiculoZona } from '../zonas/entities/veiculo-zona.entity';
+import { PedidoLocal } from './entities/pedido-local.entity';
 import { PedidoPoligonoCoords } from './entities/pedido-poligono-coords.entity';
 import { PedidoPoligono } from './entities/pedido-poligono.entity';
 import { Pedido } from './entities/pedido.entity';
-import { PedidoLocal } from './entities/pedidoLocal.entity';
 import { PedidosRoterizados } from './entities/pedidos-roterizados.entity';
 import { Roteiro } from './entities/roteiro.entity';
 import { Veiculo } from './entities/veiculo.entity';
