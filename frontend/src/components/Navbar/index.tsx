@@ -9,6 +9,7 @@ const navigation = [
   { name: "Zonas", to: "/zonas" },
   { name: "Veículos", to: "/veiculos" },
   { name: "Locais", to: "/locais" },
+  { name: "Monitoramento", to: "/monitoramento" },
 ];
 
 function classNames(...classes: string[]) {

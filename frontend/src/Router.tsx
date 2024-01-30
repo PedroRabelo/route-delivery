@@ -7,6 +7,7 @@ import { CreateDelivery } from "./pages/Deliveries/create";
 import { DeliveryLocations } from "./pages/Deliveries/locations";
 import { RoutesDelivery } from "./pages/Deliveries/routes-delivery";
 import { Locations } from "./pages/Locations";
+import { Monitoring } from "./pages/Monitoring";
 import { TrackRoutes } from "./pages/TrackRoutes";
 import { Vehicles } from "./pages/Vehicles";
 import Zones from "./pages/Zones";
@@ -25,6 +26,7 @@ export function Router() {
         <Route path="/clientes" element={<Clients />} />
         <Route path="/rastreamento" element={<TrackRoutes />} />
         <Route path="/locais" element={<Locations />} />
+        <Route path="/monitoramento" element={<Monitoring />} />
       </Route>
     </Routes>
   );
