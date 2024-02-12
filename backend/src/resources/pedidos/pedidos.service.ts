@@ -158,10 +158,14 @@ export class PedidosService {
         VEIC.ORD_CAR as ordem,
         PED.Bruto as peso,
         PED.Total as valor,
-        PED.ordem as ordemPedido
+        PED.ordem as ordemPedido,
+        PED.tipo_servico as tipo,
+        LC.restritivo_horario as horarioRestrito,
+        LC.endereco_coletivo as coletivo 
       FROM 
         PEDIDOS PED 
         INNER JOIN VEICULOS VEIC ON VEIC.ID = PED.ID_VEICULO 
+        INNER JOIN PEDIDOS_LOCAIS LC ON PED.id_pedidos_locais = LC.ID 
       WHERE 
         PED.roteiroId = @0
       `,

@@ -19,6 +19,9 @@ export type DeliveryPoints = {
   valor: number;
   observacao: string;
   ordemPedido: number;
+  tipo: string;
+  horarioRestrito: boolean;
+  coletivo: boolean;
 };
 
 export type DeliveryVehicle = {
