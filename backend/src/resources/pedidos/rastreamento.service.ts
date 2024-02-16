@@ -9,7 +9,7 @@ export class RastreamentoService {
   constructor(
     @InjectRepository(Veiculo)
     private veiculoRepository: Repository<Veiculo>,
-  ) {}
+  ) { }
 
   async trackVehicles() {
     const veiculos = await this.veiculoRepository.query(
@@ -30,7 +30,7 @@ export class RastreamentoService {
     return veiculos;
   }
 
-  @Cron('*/2 * * * *')
+  @Cron('*/30 * * * * *')
   async syncMultiportal() {
     console.log('sincronizar rastreador');
     await this.veiculoRepository.query(
