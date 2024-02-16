@@ -125,7 +125,7 @@ export function MapLocations({
 
   function markerColor(tipoServico: string, coletivo: boolean, restrito: boolean) {
 
-    let color;
+    let color = "#f54248";
     if (tipoServico === 'entrega') color = "#111"
     if (tipoServico === 'reentrega') color = "#2f6deb"
     if (tipoServico === 'devolucao') color = "#932feb"
@@ -205,7 +205,7 @@ export function MapLocations({
                   }
                   clusterer={clusterer}
                   label={{
-                    text: `${point.ordem}`, // codepoint from https://fonts.google.com/icons
+                    text: `${Number(point.ordem) === 0 ? ' ' : point.ordem}`, // codepoint from https://fonts.google.com/icons
                     color: "#111",
                     fontSize: "14px",
                   }}
