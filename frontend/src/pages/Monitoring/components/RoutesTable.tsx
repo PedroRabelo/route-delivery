@@ -1,39 +1,27 @@
 import classNames from "classnames";
-import { useState } from "react";
-
-const routes = [
-  {
-    id: 1,
-    nome: "Shopping",
-    alerta: "Fora do trecho",
-    status: "No local",
-    tempoRestante: 12,
-    distanciaRestante: 15,
-    observacao: "Tempo ultrapassou 15 minutos como previsto"
-  },
-  {
-    id: 2,
-    nome: "Shopping",
-    alerta: "Fora do trecho",
-    status: "No local",
-    tempoRestante: 12,
-    distanciaRestante: 15,
-    observacao: "Tempo ultrapassou 15 minutos como previsto"
-  },
-  {
-    id: 3,
-    nome: "Shopping",
-    alerta: "Fora do trecho",
-    status: "No local",
-    tempoRestante: 12,
-    distanciaRestante: 15,
-    observacao: "Tempo ultrapassou 15 minutos como previsto"
-  }
-]
-
+import { useEffect, useState } from "react";
+import { api } from "../../../lib/axios";
+import { TrackVehicle } from "../../../services/types/Route";
+import { formatDatetime } from "../../../services/utils/formatDateOnly";
 
 export function RoutesTable() {
-  const [routeSelected, setRouteSelected] = useState<number>();
+  const [routeSelected, setRouteSelected] = useState<number>()
+  const [isLoading, setIsLoading] = useState(false)
+  const [routes, setRoutes] = useState<TrackVehicle[]>([])
+
+  async function getRoutes() {
+    setIsLoading(true)
+
+    const response = await api.get('rastreamento/routes')
+
+    setRoutes(response.data)
+
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    getRoutes()
+  }, [])
 
   function handleClickRoute() {
 
@@ -41,6 +29,12 @@ export function RoutesTable() {
 
   return (
     <div className="flex flex-1 overflow-x-auto max-h-full w-full shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+      {isLoading &&
+        <div className="flex w-full h-full justify-center items-center">
+          Carregando...
+        </div>
+      }
+
       <table className="divide-y divide-gray-300 w-full">
         <thead className="bg-gray-50">
           <tr>
@@ -48,25 +42,31 @@ export function RoutesTable() {
               scope="col"
               className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
             >
-              ID
+              Placa
             </th>
             <th
               scope="col"
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Nome
+              Motorista
             </th>
             <th
               scope="col"
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Alerta
+              Cliente
             </th>
             <th
               scope="col"
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Status
+              Início
+            </th>
+            <th
+              scope="col"
+              className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              Previsão Chegada
             </th>
             <th
               scope="col"
@@ -78,13 +78,13 @@ export function RoutesTable() {
               scope="col"
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Distância Restante
+              Distância
             </th>
             <th
               scope="col"
               className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Observação
+              Status
             </th>
           </tr>
         </thead>
@@ -103,26 +103,29 @@ export function RoutesTable() {
                     )}
                     onClick={() => handleClickRoute()}
                   >
-                    {route.id}
+                    {route.placa}
                   </a>
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {route.nome}
+                  {route.motorista}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {route.alerta}
+                  {route.cliente}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {formatDatetime(route.inicioRota)}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {formatDatetime(route.chegadaPrevista)}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {route.tempoViagem}
+                </td>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {route.distancia}
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                   {route.status}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {route.tempoRestante}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {route.distanciaRestante}
-                </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {route.observacao}
                 </td>
               </tr>
             ))}

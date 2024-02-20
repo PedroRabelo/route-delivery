@@ -1,42 +1,5 @@
 
-const deliveries = [
-  {
-    id: 1,
-    cliente: "Empresa 1 asdasda sdasdasd",
-    status: "Em andamento",
-    tipo: "entrega"
-  },
-  {
-    id: 2,
-    cliente: "Empresa 1",
-    status: "Em andamento",
-    tipo: "entrega"
-  },
-  {
-    id: 3,
-    cliente: "Empresa 1",
-    status: "Em andamento",
-    tipo: "entrega"
-  },
-  {
-    id: 4,
-    cliente: "Empresa 1",
-    status: "Em andamento",
-    tipo: "entrega"
-  },
-  {
-    id: 5,
-    cliente: "Empresa 1",
-    status: "Em andamento",
-    tipo: "entrega"
-  },
-  {
-    id: 6,
-    cliente: "Empresa 1",
-    status: "Em andamento",
-    tipo: "entrega"
-  }
-]
+const deliveries = []
 
 export function DeliveriesTable() {
   return (
