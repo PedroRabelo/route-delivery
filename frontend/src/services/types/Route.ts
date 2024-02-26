@@ -10,9 +10,17 @@ export type TrackVehicle = {
   status: string
 }
 
-export type RouteDirection = {
+export type RoutesCoords = {
   id: number;
   rotaId: number;
   latitude: number;
   longitude: number;
+}
+
+export type RouteDirection = {
+  rotaId: number;
+  coords: {
+    lat: number;
+    lng: number;
+  }[]
 }

@@ -1,5 +1,7 @@
-import { GoogleMap } from "@react-google-maps/api";
-import { useCallback, useMemo, useRef } from "react";
+import { GoogleMap, Marker, Polyline } from "@react-google-maps/api";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { api } from "../../../lib/axios";
+import { RouteDirection, RoutesCoords } from "../../../services/types/Route";
 
 type LatLngLiteral = google.maps.LatLngLiteral;
 type MapOptions = google.maps.MapOptions;
@@ -10,6 +12,9 @@ export function MapDeliveries() {
     () => ({ lat: -23.5298971, lng: -46.749152 }),
     []
   );
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [routes, setRoutes] = useState<RouteDirection[]>([])
 
   const options = useMemo<MapOptions>(
     () => ({
@@ -22,6 +27,46 @@ export function MapDeliveries() {
     }),
     []
   );
+
+  async function getRoutes() {
+    setIsLoading(true)
+
+    const response: RoutesCoords[] = await (await api.get('rastreamento/direction')).data
+
+    if (response.length > 0) {
+      // let grouped: { rotaId: number, coords: LatLngLiteral } = await response.reduce(
+      //   (result: any, currentValue: any) => {
+      //     (result[currentValue['rotaId']] = result[currentValue['rotaId']] || []).push(currentValue);
+      //     return result;
+      //   }, {});
+
+      var rota: number = 0;
+      var coords: RouteDirection[] = []
+      var index: number = -1;
+      for (var i = 0; i < response.length; i++) {
+        if (coords.length === 0 || rota !== response[i].rotaId) {
+          coords.push({
+            rotaId: rota,
+            coords: []
+          })
+          ++index;
+          response.filter(r => r.rotaId === rota).map(f => coords[index].coords.push({
+            lat: Number(f.latitude),
+            lng: Number(f.longitude)
+          }))
+          rota = response[i].rotaId;
+        }
+      }
+      console.log(coords);
+      setRoutes(coords)
+    }
+
+    setIsLoading(false)
+  }
+
+  useEffect(() => {
+    getRoutes()
+  }, [])
 
   const onLoad = useCallback((map: any) => {
     mapRef.current = map;
@@ -36,6 +81,30 @@ export function MapDeliveries() {
       onLoad={onLoad}
     >
 
+
+      {routes.length > 0 && routes.map(r => (
+        <>
+          <Marker
+            position={r.coords[0]}
+            label={{
+              text: `${r.rotaId}`,
+              color: '#fff'
+            }}
+          />
+          <Marker
+            position={r.coords[r.coords.length - 1]}
+            label={{
+              text: `${r.rotaId}`,
+              color: '#fff'
+            }}
+          />
+          <Polyline
+            key={r.rotaId}
+            path={r.coords}
+
+          />
+        </>
+      ))}
     </GoogleMap>
   )
 }
