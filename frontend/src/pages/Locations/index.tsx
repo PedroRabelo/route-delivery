@@ -8,12 +8,6 @@ import { EditLocation } from "./components/EditLocation";
 import { LocationsTable } from "./components/LocationsTable";
 import { MapAddress } from "./components/MapAddress";
 
-type Filters = {
-  id?: string;
-  cep?: string;
-  address?: string
-}
-
 export function Locations() {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY
