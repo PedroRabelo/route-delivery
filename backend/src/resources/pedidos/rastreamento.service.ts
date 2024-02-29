@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Veiculo } from './entities/veiculo.entity';
@@ -95,7 +96,7 @@ export class RastreamentoService {
     return deliveries
   }
 
-  //@Cron('*/30 * * * * *')
+  @Cron('*/30 * * * * *')
   async syncMultiportal() {
     console.log('sincronizar rastreador');
     await this.veiculoRepository.query(
