@@ -1,7 +1,5 @@
 import { useLoadScript } from "@react-google-maps/api";
 import { useRef, useState } from "react";
-import { Button } from "../../components/Button";
-import { Input } from "../../components/Input";
 import { DeliveriesTable } from "./components/DeliveriesTable";
 import { MapDeliveries } from "./components/MapDeliveries";
 import { RoutesTable } from "./components/RoutesTable";
@@ -13,7 +11,7 @@ export function Monitoring() {
 
   const inputNomeRef = useRef<HTMLInputElement>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [truckSelected, setTruckSelected] = useState('');
 
   if (!isLoaded) {
     return (
@@ -31,14 +29,16 @@ export function Monitoring() {
     <div className="flex flex-1 flex-col w-full h-full gap-2">
       <div className="flex h-[40vh]">
         <div className="w-1/3">
-          <DeliveriesTable />
+          <DeliveriesTable
+            truck={truckSelected}
+          />
         </div>
         <div className="w-2/3">
           <MapDeliveries />
         </div>
       </div>
 
-      <div className="flex gap-2 items-center">
+      {/* <div className="flex gap-2 items-center">
         <span className="text-sm font-semibold text-gray-900 mr-2 mb-1">Filtros:</span>
         <div className="md:grid md:grid-cols-12 md:gap-6">
           <div className="flex items-center gap-1 md:col-span-1">
@@ -62,10 +62,12 @@ export function Monitoring() {
             />
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className="flex h-[41vh]">
-        <RoutesTable />
+      <div className="flex h-[47vh]">
+        <RoutesTable
+          onSelectTruck={(truck: string) => setTruckSelected(truck)}
+        />
       </div>
     </div>
   )

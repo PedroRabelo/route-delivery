@@ -19,8 +19,23 @@ export type RoutesCoords = {
 
 export type RouteDirection = {
   rotaId: number;
+  options: {
+    strokeOpacity: number;
+    strokeColor: string;
+    strokeWeight: number;
+    draggable: boolean;
+    editable: boolean;
+  };
   coords: {
     lat: number;
     lng: number;
   }[]
+}
+
+export type TruckDeliveries = {
+  rotaId: number;
+  pedidoId: number;
+  cliente: string;
+  status: number;
+  tipoServico: string;
 }

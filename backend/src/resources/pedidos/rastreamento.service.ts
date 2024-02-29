@@ -45,9 +45,6 @@ export class RastreamentoService {
       FROM 
 	      APP_ROTA ar 
 	      INNER JOIN PEDIDOS p on ar.DocId = p.Ped
-	      INNER JOIN MULTIPORTAL.dbo.TB_RASTREADOR tr on ar.Id = tr.ID_ROTA 
-      WHERE 
-      	tr.ID_ROTA > 0
       ORDER BY
         ar.InicioRota;
       `,
@@ -59,22 +56,43 @@ export class RastreamentoService {
   async routesDirection() {
     const routes = await this.veiculoRepository.query(
       `
-      SELECT
-    	  arc.id as id,
-    	  arc.id_rota as rotaId,
-    	  arc.point_lat as latitude,
-    	  arc.point_lon as longitude
+      SELECT 
+	      arc.id as id,
+  	    arc.id_rota as rotaId,
+	      arc.point_lat as latitude,
+        arc.point_lon as longitude
       FROM 
-    	  APP_ROTA_CAMINHO arc 
-    	  INNER JOIN MULTIPORTAL.dbo.TB_RASTREADOR tr on arc.id_rota = tr.ID_ROTA 
-      WHERE 
-    	  tr.ID_ROTA is not null
+	      APP_ROTA ar 
+	      INNER JOIN APP_ROTA_CAMINHO arc on ar.Id = arc.id_rota
       ORDER BY 
-    	  arc.id_rota, arc.id;
+      	arc.id_rota, arc.id;
       `
     );
 
     return routes;
+  }
+
+  async deliveriesByTruck(placa: string) {
+    const deliveries = await this.veiculoRepository.query(
+      `
+      SELECT
+        arh.Id as id,
+        arh.DocId as pedidoId,
+        p.Cliente as cliente,
+        arh.Status as status,
+        p.tipo_servico as tipoServico 
+      FROM
+	      APP_ROTA_HISTORICO arh
+  	    INNER JOIN PEDIDOS p on arh.DocId = p.Ped and arh.RoteiroId = p.roteiroId 
+      WHERE
+	      arh.Placa = @0
+      ORDER BY
+	      arh.InicioRota 
+      `,
+      [placa]
+    )
+
+    return deliveries
   }
 
   //@Cron('*/30 * * * * *')

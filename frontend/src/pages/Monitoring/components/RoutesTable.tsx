@@ -4,8 +4,12 @@ import { api } from "../../../lib/axios";
 import { TrackVehicle } from "../../../services/types/Route";
 import { formatDatetime } from "../../../services/utils/formatDateOnly";
 
-export function RoutesTable() {
-  const [routeSelected, setRouteSelected] = useState<number>()
+interface Props {
+  onSelectTruck(truck: string): void;
+}
+
+export function RoutesTable({ onSelectTruck }: Props) {
+  const [truckSelected, setTruckSelected] = useState<string>()
   const [isLoading, setIsLoading] = useState(false)
   const [routes, setRoutes] = useState<TrackVehicle[]>([])
 
@@ -21,10 +25,17 @@ export function RoutesTable() {
 
   useEffect(() => {
     getRoutes()
+
+    const interval = setInterval(() => {
+      getRoutes();
+    }, 45000);
+
+    return () => clearInterval(interval);
   }, [])
 
-  function handleClickRoute() {
-
+  function handleClickRoute(truck: string) {
+    setTruckSelected(truck)
+    onSelectTruck(truck)
   }
 
   return (
@@ -38,6 +49,12 @@ export function RoutesTable() {
       <table className="divide-y divide-gray-300 w-full">
         <thead className="bg-gray-50">
           <tr>
+            <th
+              scope="col"
+              className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
+            >
+              ID
+            </th>
             <th
               scope="col"
               className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
@@ -93,15 +110,18 @@ export function RoutesTable() {
             routes?.length > 0 &&
             routes.map((route) => (
               <tr key={route.id}>
+                <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                  {route.id}
+                </td>
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
                   <a
                     className={classNames(
-                      routeSelected === route.id
+                      truckSelected === route.placa
                         ? "text-indigo-500"
                         : "text-gray-900",
-                      "cursor-pointer text-base font-bold"
+                      "cursor-pointer text-sm font-bold"
                     )}
-                    onClick={() => handleClickRoute()}
+                    onClick={() => handleClickRoute(route.placa)}
                   >
                     {route.placa}
                   </a>

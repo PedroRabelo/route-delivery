@@ -47,6 +47,13 @@ export function MapDeliveries() {
         if (coords.length === 0 || rota !== response[i].rotaId) {
           coords.push({
             rotaId: rota,
+            options: {
+              strokeOpacity: 1,
+              strokeColor: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase()}`,
+              strokeWeight: 2,
+              draggable: false,
+              editable: false
+            },
             coords: []
           })
           ++index;
@@ -57,7 +64,6 @@ export function MapDeliveries() {
           rota = response[i].rotaId;
         }
       }
-      console.log(coords);
       setRoutes(coords)
     }
 
@@ -66,6 +72,12 @@ export function MapDeliveries() {
 
   useEffect(() => {
     getRoutes()
+
+    const interval = setInterval(() => {
+      getRoutes();
+    }, 45000);
+
+    return () => clearInterval(interval);
   }, [])
 
   const onLoad = useCallback((map: any) => {
@@ -81,9 +93,8 @@ export function MapDeliveries() {
       onLoad={onLoad}
     >
 
-
       {routes.length > 0 && routes.map(r => (
-        <>
+        <div key={r.rotaId}>
           <Marker
             position={r.coords[0]}
             label={{
@@ -99,11 +110,10 @@ export function MapDeliveries() {
             }}
           />
           <Polyline
-            key={r.rotaId}
             path={r.coords}
-
+            options={r.options}
           />
-        </>
+        </div>
       ))}
     </GoogleMap>
   )

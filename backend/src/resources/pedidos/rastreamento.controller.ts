@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { RastreamentoService } from './rastreamento.service';
 
 @Controller('rastreamento')
@@ -16,7 +16,12 @@ export class RastreamentoController {
   }
 
   @Get('direction')
-  RoutesDirection() {
+  routesDirection() {
     return this.rastreamentoService.routesDirection();
+  }
+
+  @Get('deliveries/:truck')
+  deliveriesByTruck(@Param('truck') truck: string) {
+    return this.rastreamentoService.deliveriesByTruck(truck);
   }
 }
