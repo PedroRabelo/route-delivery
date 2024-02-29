@@ -15,8 +15,6 @@ export class PedidosLocaisService {
   async listPedidosLocais(filters: LocaisFilter) {
     const where: FindOptionsWhere<PedidoLocal>[] = [];
 
-    console.log(filters)
-
     if (filters.id !== undefined && !Number.isNaN(filters.id)) {
       where.push({ id: filters.id })
     }
